@@ -272,7 +272,7 @@ class GoogleDriveApp(APIApplication):
         response_data = upload_response.json()
         return response_data
 
-    def list_user_sinstalled_apps(self, appFilterExtensions=None, appFilterMimeTypes=None, languageCode=None, access_token=None, alt=None, callback=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, upload_protocol=None, uploadType=None, __xgafv=None) -> dict[str, Any]:
+    def list_user_sinstalled_apps(self, appFilterExtensions=None, appFilterMimeTypes=None, languageCode=None, access_token=None, alt=None, callback=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, upload_protocol=None, uploadType=None, xgafv=None) -> dict[str, Any]:
         """
         List user's installed apps
 
@@ -290,7 +290,7 @@ class GoogleDriveApp(APIApplication):
             quotaUser (string): Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Example: '<string>'.
             upload_protocol (string): Upload protocol for media (e.g. "raw", "multipart"). Example: '<string>'.
             uploadType (string): Legacy upload protocol for media (e.g. "media", "multipart"). Example: '<string>'.
-            __xgafv (string): V1 error format. Example: '<string>'.
+            xgafv (string): V1 error format. Example: '<string>'.
 
         Returns:
             dict[str, Any]: Successful response
@@ -299,12 +299,12 @@ class GoogleDriveApp(APIApplication):
             Apps
         """
         url = f"{self.base_url}/apps"
-        query_params = {k: v for k, v in [('appFilterExtensions', appFilterExtensions), ('appFilterMimeTypes', appFilterMimeTypes), ('languageCode', languageCode), ('access_token', access_token), ('alt', alt), ('callback', callback), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('upload_protocol', upload_protocol), ('uploadType', uploadType), ('$.xgafv', __xgafv)] if v is not None}
+        query_params = {k: v for k, v in [('appFilterExtensions', appFilterExtensions), ('appFilterMimeTypes', appFilterMimeTypes), ('languageCode', languageCode), ('access_token', access_token), ('alt', alt), ('callback', callback), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('upload_protocol', upload_protocol), ('uploadType', uploadType), ('$.xgafv', xgafv)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
         return response.json()
 
-    def get_aspecific_app(self, appId, access_token=None, alt=None, callback=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, upload_protocol=None, uploadType=None, __xgafv=None) -> dict[str, Any]:
+    def get_aspecific_app(self, appId, access_token=None, alt=None, callback=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, upload_protocol=None, uploadType=None, xgafv=None) -> dict[str, Any]:
         """
         Get a specific app
 
@@ -320,7 +320,7 @@ class GoogleDriveApp(APIApplication):
             quotaUser (string): Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Example: '<string>'.
             upload_protocol (string): Upload protocol for media (e.g. "raw", "multipart"). Example: '<string>'.
             uploadType (string): Legacy upload protocol for media (e.g. "media", "multipart"). Example: '<string>'.
-            __xgafv (string): V1 error format. Example: '<string>'.
+            xgafv (string): V1 error format. Example: '<string>'.
 
         Returns:
             dict[str, Any]: Successful response
@@ -331,7 +331,7 @@ class GoogleDriveApp(APIApplication):
         if appId is None:
             raise ValueError("Missing required parameter 'appId'")
         url = f"{self.base_url}/apps/{appId}"
-        query_params = {k: v for k, v in [('access_token', access_token), ('alt', alt), ('callback', callback), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('upload_protocol', upload_protocol), ('uploadType', uploadType), ('$.xgafv', __xgafv)] if v is not None}
+        query_params = {k: v for k, v in [('access_token', access_token), ('alt', alt), ('callback', callback), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('upload_protocol', upload_protocol), ('uploadType', uploadType), ('$.xgafv', xgafv)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
         return response.json()
