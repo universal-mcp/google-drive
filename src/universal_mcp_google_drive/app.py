@@ -1,9 +1,9 @@
-from typing import Any
+from typing import Any, List, Optional
 
 import httpx
 from loguru import logger
 
-from universal_mcp.applications.application import APIApplication
+from universal_mcp.applications import APIApplication
 from universal_mcp.integrations import Integration
 
 
@@ -272,14 +272,14 @@ class GoogleDriveApp(APIApplication):
         response_data = upload_response.json()
         return response_data
 
-    def list_user_sinstalled_apps(self, appFilterExtensions=None, appFilterMimeTypes=None, languageCode=None, access_token=None, alt=None, callback=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, upload_protocol=None, uploadType=None, xgafv=None) -> dict[str, Any]:
+    def list_user_sinstalled_apps(self, appFilterExtensions: Optional[str] = None, appFilterMimeTypes: Optional[str] = None, languageCode: Optional[str] = None, access_token: Optional[str] = None, alt: Optional[str] = None, callback: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, upload_protocol: Optional[str] = None, uploadType: Optional[str] = None, xgafv: Optional[str] = None) -> dict[str, Any]:
         """
         List user's installed apps
 
         Args:
-            appFilterExtensions (string): No description provided. Example: '<string>'.
-            appFilterMimeTypes (string): No description provided. Example: '<string>'.
-            languageCode (string): No description provided. Example: '<string>'.
+            appFilterExtensions (string): A query parameter to filter applications based on extensions, allowing string values to be specified in the URL. Example: '<string>'.
+            appFilterMimeTypes (string): Filters the results to include only apps that can open any of the provided comma-separated list of MIME types[4][1]. Example: '<string>'.
+            languageCode (string): Specifies the language code for the query results returned from the apps endpoint. Example: '<string>'.
             access_token (string): OAuth access token. Example: '{{accessToken}}'.
             alt (string): Data format for response. Example: '<string>'.
             callback (string): JSONP Example: '<string>'.
@@ -295,6 +295,10 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Apps
         """
@@ -302,9 +306,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('appFilterExtensions', appFilterExtensions), ('appFilterMimeTypes', appFilterMimeTypes), ('languageCode', languageCode), ('access_token', access_token), ('alt', alt), ('callback', callback), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('upload_protocol', upload_protocol), ('uploadType', uploadType), ('$.xgafv', xgafv)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def get_aspecific_app(self, appId, access_token=None, alt=None, callback=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, upload_protocol=None, uploadType=None, xgafv=None) -> dict[str, Any]:
+    def get_aspecific_app(self, appId: str, access_token: Optional[str] = None, alt: Optional[str] = None, callback: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, upload_protocol: Optional[str] = None, uploadType: Optional[str] = None, xgafv: Optional[str] = None) -> dict[str, Any]:
         """
         Get a specific app
 
@@ -325,18 +334,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Apps
         """
         if appId is None:
-            raise ValueError("Missing required parameter 'appId'")
+            raise ValueError("Missing required parameter 'appId'.")
         url = f"{self.base_url}/apps/{appId}"
         query_params = {k: v for k, v in [('access_token', access_token), ('alt', alt), ('callback', callback), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('upload_protocol', upload_protocol), ('uploadType', uploadType), ('$.xgafv', xgafv)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def information_about_user_and_drive(self, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def information_about_user_and_drive(self, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Information about user and drive
 
@@ -352,6 +370,10 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Information
         """
@@ -359,9 +381,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def list_changes_made_to_afile_or_drive(self, pageToken=None, driveId=None, includeCorpusRemovals=None, includeItemsFromAllDrives=None, includeLabels=None, includePermissionsForView=None, includeRemoved=None, includeTeamDriveItems=None, pageSize=None, restrictToMyDrive=None, spaces=None, supportsAllDrives=None, supportsTeamDrives=None, teamDriveId=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def list_changes_made_to_afile_or_drive(self, pageToken: Optional[str] = None, driveId: Optional[str] = None, includeCorpusRemovals: Optional[str] = None, includeItemsFromAllDrives: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, includeRemoved: Optional[str] = None, includeTeamDriveItems: Optional[str] = None, pageSize: Optional[str] = None, restrictToMyDrive: Optional[str] = None, spaces: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, teamDriveId: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         List changes made to a file or drive
 
@@ -391,6 +418,10 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Changes
         """
@@ -398,9 +429,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('pageToken', pageToken), ('driveId', driveId), ('includeCorpusRemovals', includeCorpusRemovals), ('includeItemsFromAllDrives', includeItemsFromAllDrives), ('includeLabels', includeLabels), ('includePermissionsForView', includePermissionsForView), ('includeRemoved', includeRemoved), ('includeTeamDriveItems', includeTeamDriveItems), ('pageSize', pageSize), ('restrictToMyDrive', restrictToMyDrive), ('spaces', spaces), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('teamDriveId', teamDriveId), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def gets_the_starting_pagetoken_for_listing_future_changes(self, driveId=None, supportsAllDrives=None, supportsTeamDrives=None, teamDriveId=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def get_start_page_token(self, driveId: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, teamDriveId: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Gets the starting pageToken for listing future changes
 
@@ -420,6 +456,10 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Changes
         """
@@ -427,9 +467,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('driveId', driveId), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('teamDriveId', teamDriveId), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def subscribe_to_changes_for_auser(self, pageToken=None, driveId=None, includeCorpusRemovals=None, includeItemsFromAllDrives=None, includeLabels=None, includePermissionsForView=None, includeRemoved=None, includeTeamDriveItems=None, pageSize=None, restrictToMyDrive=None, spaces=None, supportsAllDrives=None, supportsTeamDrives=None, teamDriveId=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, address=None, expiration=None, id=None, kind=None, params=None, payload=None, resourceId=None, resourceUri=None, token=None, type=None) -> dict[str, Any]:
+    def subscribe_to_changes_for_auser(self, pageToken: Optional[str] = None, driveId: Optional[str] = None, includeCorpusRemovals: Optional[str] = None, includeItemsFromAllDrives: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, includeRemoved: Optional[str] = None, includeTeamDriveItems: Optional[str] = None, pageSize: Optional[str] = None, restrictToMyDrive: Optional[str] = None, spaces: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, teamDriveId: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, address: Optional[str] = None, expiration: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, params: Optional[dict[str, Any]] = None, payload: Optional[str] = None, resourceId: Optional[str] = None, resourceUri: Optional[str] = None, token: Optional[str] = None, type: Optional[str] = None) -> dict[str, Any]:
         """
         Subscribe to changes for a user
 
@@ -459,39 +504,25 @@ class GoogleDriveApp(APIApplication):
             expiration (string): expiration Example: '<int64>'.
             id (string): id Example: '<string>'.
             kind (string): kind Example: 'api#channel'.
-            params (object): params
+            params (object): params Example: {'adipisicing1': '<string>', 'eu2': '<string>', 'qui_9': '<string>'}.
             payload (string): payload Example: '<boolean>'.
             resourceId (string): resourceId Example: '<string>'.
             resourceUri (string): resourceUri Example: '<string>'.
             token (string): token Example: '<string>'.
-            type (string): type
-                Example:
-                ```json
-                {
-                  "address": "<string>",
-                  "expiration": "<int64>",
-                  "id": "<string>",
-                  "kind": "api#channel",
-                  "params": {
-                    "adipisicing1": "<string>",
-                    "eu2": "<string>",
-                    "qui_9": "<string>"
-                  },
-                  "payload": "<boolean>",
-                  "resourceId": "<string>",
-                  "resourceUri": "<string>",
-                  "token": "<string>",
-                  "type": "<string>"
-                }
-                ```
+            type (string): type Example: '<string>'.
 
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Changes
         """
-        request_body = {
+        request_body_data = None
+        request_body_data = {
             'address': address,
             'expiration': expiration,
             'id': id,
@@ -503,14 +534,19 @@ class GoogleDriveApp(APIApplication):
             'token': token,
             'type': type,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/changes/watch"
         query_params = {k: v for k, v in [('pageToken', pageToken), ('driveId', driveId), ('includeCorpusRemovals', includeCorpusRemovals), ('includeItemsFromAllDrives', includeItemsFromAllDrives), ('includeLabels', includeLabels), ('includePermissionsForView', includePermissionsForView), ('includeRemoved', includeRemoved), ('includeTeamDriveItems', includeTeamDriveItems), ('pageSize', pageSize), ('restrictToMyDrive', restrictToMyDrive), ('spaces', spaces), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('teamDriveId', teamDriveId), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def stop_watching_resources_through_achannel(self, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, address=None, expiration=None, id=None, kind=None, params=None, payload=None, resourceId=None, resourceUri=None, token=None, type=None) -> Any:
+    def post_stop_channel(self, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, address: Optional[str] = None, expiration: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, params: Optional[dict[str, Any]] = None, payload: Optional[str] = None, resourceId: Optional[str] = None, resourceUri: Optional[str] = None, token: Optional[str] = None, type: Optional[str] = None) -> Any:
         """
         Stop watching resources through a channel
 
@@ -526,39 +562,25 @@ class GoogleDriveApp(APIApplication):
             expiration (string): expiration Example: '<int64>'.
             id (string): id Example: '<string>'.
             kind (string): kind Example: 'api#channel'.
-            params (object): params
+            params (object): params Example: {'adipisicing1': '<string>', 'eu2': '<string>', 'qui_9': '<string>'}.
             payload (string): payload Example: '<boolean>'.
             resourceId (string): resourceId Example: '<string>'.
             resourceUri (string): resourceUri Example: '<string>'.
             token (string): token Example: '<string>'.
-            type (string): type
-                Example:
-                ```json
-                {
-                  "address": "<string>",
-                  "expiration": "<int64>",
-                  "id": "<string>",
-                  "kind": "api#channel",
-                  "params": {
-                    "adipisicing1": "<string>",
-                    "eu2": "<string>",
-                    "qui_9": "<string>"
-                  },
-                  "payload": "<boolean>",
-                  "resourceId": "<string>",
-                  "resourceUri": "<string>",
-                  "token": "<string>",
-                  "type": "<string>"
-                }
-                ```
+            type (string): type Example: '<string>'.
 
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Channels
         """
-        request_body = {
+        request_body_data = None
+        request_body_data = {
             'address': address,
             'expiration': expiration,
             'id': id,
@@ -570,14 +592,19 @@ class GoogleDriveApp(APIApplication):
             'token': token,
             'type': type,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/channels/stop"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def lists_afile_scomments(self, fileId, includeDeleted=None, pageSize=None, pageToken=None, startModifiedTime=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def lists_afile_scomments(self, fileId: str, includeDeleted: Optional[str] = None, pageSize: Optional[str] = None, pageToken: Optional[str] = None, startModifiedTime: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Lists a file's comments
 
@@ -598,18 +625,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Comments
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         url = f"{self.base_url}/files/{fileId}/comments"
         query_params = {k: v for k, v in [('includeDeleted', includeDeleted), ('pageSize', pageSize), ('pageToken', pageToken), ('startModifiedTime', startModifiedTime), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def create_acomment_on_afile(self, fileId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, anchor=None, author=None, content=None, createdTime=None, deleted=None, htmlContent=None, id=None, kind=None, modifiedTime=None, quotedFileContent=None, replies=None, resolved=None) -> dict[str, Any]:
+    def create_acomment_on_afile(self, fileId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, anchor: Optional[str] = None, author: Optional[dict[str, Any]] = None, content: Optional[str] = None, createdTime: Optional[str] = None, deleted: Optional[str] = None, htmlContent: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, modifiedTime: Optional[str] = None, quotedFileContent: Optional[dict[str, Any]] = None, replies: Optional[List[dict[str, Any]]] = None, resolved: Optional[str] = None) -> dict[str, Any]:
         """
         Create a comment on a file
 
@@ -623,7 +659,7 @@ class GoogleDriveApp(APIApplication):
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
             anchor (string): anchor Example: '<string>'.
-            author (object): author
+            author (object): author Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
             content (string): content Example: '<string>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             deleted (string): deleted Example: '<boolean>'.
@@ -631,83 +667,24 @@ class GoogleDriveApp(APIApplication):
             id (string): id Example: '<string>'.
             kind (string): kind Example: 'drive#comment'.
             modifiedTime (string): modifiedTime Example: '<dateTime>'.
-            quotedFileContent (object): quotedFileContent
+            quotedFileContent (object): quotedFileContent Example: {'mimeType': '<string>', 'value': '<string>'}.
             replies (array): replies Example: "[{'action': '<string>', 'author': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'content': '<string>', 'createdTime': '<dateTime>', 'deleted': '<boolean>', 'htmlContent': '<string>', 'id': '<string>', 'kind': 'drive#reply', 'modifiedTime': '<dateTime>'}, {'action': '<string>', 'author': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'content': '<string>', 'createdTime': '<dateTime>', 'deleted': '<boolean>', 'htmlContent': '<string>', 'id': '<string>', 'kind': 'drive#reply', 'modifiedTime': '<dateTime>'}]".
-            resolved (string): resolved
-                Example:
-                ```json
-                {
-                  "anchor": "<string>",
-                  "author": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "content": "<string>",
-                  "createdTime": "<dateTime>",
-                  "deleted": "<boolean>",
-                  "htmlContent": "<string>",
-                  "id": "<string>",
-                  "kind": "drive#comment",
-                  "modifiedTime": "<dateTime>",
-                  "quotedFileContent": {
-                    "mimeType": "<string>",
-                    "value": "<string>"
-                  },
-                  "replies": [
-                    {
-                      "action": "<string>",
-                      "author": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "content": "<string>",
-                      "createdTime": "<dateTime>",
-                      "deleted": "<boolean>",
-                      "htmlContent": "<string>",
-                      "id": "<string>",
-                      "kind": "drive#reply",
-                      "modifiedTime": "<dateTime>"
-                    },
-                    {
-                      "action": "<string>",
-                      "author": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "content": "<string>",
-                      "createdTime": "<dateTime>",
-                      "deleted": "<boolean>",
-                      "htmlContent": "<string>",
-                      "id": "<string>",
-                      "kind": "drive#reply",
-                      "modifiedTime": "<dateTime>"
-                    }
-                  ],
-                  "resolved": "<boolean>"
-                }
-                ```
+            resolved (string): resolved Example: '<boolean>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Comments
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'fileId'.")
+        request_body_data = None
+        request_body_data = {
             'anchor': anchor,
             'author': author,
             'content': content,
@@ -721,14 +698,19 @@ class GoogleDriveApp(APIApplication):
             'replies': replies,
             'resolved': resolved,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/comments"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def get_comment_by_id(self, fileId, commentId, includeDeleted=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def get_comment_by_id(self, fileId: str, commentId: str, includeDeleted: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Get comment by ID
 
@@ -747,20 +729,29 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Comments
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if commentId is None:
-            raise ValueError("Missing required parameter 'commentId'")
+            raise ValueError("Missing required parameter 'commentId'.")
         url = f"{self.base_url}/files/{fileId}/comments/{commentId}"
         query_params = {k: v for k, v in [('includeDeleted', includeDeleted), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def delete_acomment(self, fileId, commentId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> Any:
+    def delete_acomment(self, fileId: str, commentId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> Any:
         """
         Delete a comment
 
@@ -778,20 +769,29 @@ class GoogleDriveApp(APIApplication):
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Comments
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if commentId is None:
-            raise ValueError("Missing required parameter 'commentId'")
+            raise ValueError("Missing required parameter 'commentId'.")
         url = f"{self.base_url}/files/{fileId}/comments/{commentId}"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._delete(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def update_comment(self, fileId, commentId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, anchor=None, author=None, content=None, createdTime=None, deleted=None, htmlContent=None, id=None, kind=None, modifiedTime=None, quotedFileContent=None, replies=None, resolved=None) -> dict[str, Any]:
+    def update_comment(self, fileId: str, commentId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, anchor: Optional[str] = None, author: Optional[dict[str, Any]] = None, content: Optional[str] = None, createdTime: Optional[str] = None, deleted: Optional[str] = None, htmlContent: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, modifiedTime: Optional[str] = None, quotedFileContent: Optional[dict[str, Any]] = None, replies: Optional[List[dict[str, Any]]] = None, resolved: Optional[str] = None) -> dict[str, Any]:
         """
         Update comment
 
@@ -806,7 +806,7 @@ class GoogleDriveApp(APIApplication):
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
             anchor (string): anchor Example: '<string>'.
-            author (object): author
+            author (object): author Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
             content (string): content Example: '<string>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             deleted (string): deleted Example: '<boolean>'.
@@ -814,85 +814,26 @@ class GoogleDriveApp(APIApplication):
             id (string): id Example: '<string>'.
             kind (string): kind Example: 'drive#comment'.
             modifiedTime (string): modifiedTime Example: '<dateTime>'.
-            quotedFileContent (object): quotedFileContent
+            quotedFileContent (object): quotedFileContent Example: {'mimeType': '<string>', 'value': '<string>'}.
             replies (array): replies Example: "[{'action': '<string>', 'author': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'content': '<string>', 'createdTime': '<dateTime>', 'deleted': '<boolean>', 'htmlContent': '<string>', 'id': '<string>', 'kind': 'drive#reply', 'modifiedTime': '<dateTime>'}, {'action': '<string>', 'author': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'content': '<string>', 'createdTime': '<dateTime>', 'deleted': '<boolean>', 'htmlContent': '<string>', 'id': '<string>', 'kind': 'drive#reply', 'modifiedTime': '<dateTime>'}]".
-            resolved (string): resolved
-                Example:
-                ```json
-                {
-                  "anchor": "<string>",
-                  "author": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "content": "<string>",
-                  "createdTime": "<dateTime>",
-                  "deleted": "<boolean>",
-                  "htmlContent": "<string>",
-                  "id": "<string>",
-                  "kind": "drive#comment",
-                  "modifiedTime": "<dateTime>",
-                  "quotedFileContent": {
-                    "mimeType": "<string>",
-                    "value": "<string>"
-                  },
-                  "replies": [
-                    {
-                      "action": "<string>",
-                      "author": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "content": "<string>",
-                      "createdTime": "<dateTime>",
-                      "deleted": "<boolean>",
-                      "htmlContent": "<string>",
-                      "id": "<string>",
-                      "kind": "drive#reply",
-                      "modifiedTime": "<dateTime>"
-                    },
-                    {
-                      "action": "<string>",
-                      "author": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "content": "<string>",
-                      "createdTime": "<dateTime>",
-                      "deleted": "<boolean>",
-                      "htmlContent": "<string>",
-                      "id": "<string>",
-                      "kind": "drive#reply",
-                      "modifiedTime": "<dateTime>"
-                    }
-                  ],
-                  "resolved": "<boolean>"
-                }
-                ```
+            resolved (string): resolved Example: '<boolean>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Comments
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if commentId is None:
-            raise ValueError("Missing required parameter 'commentId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'commentId'.")
+        request_body_data = None
+        request_body_data = {
             'anchor': anchor,
             'author': author,
             'content': content,
@@ -906,14 +847,19 @@ class GoogleDriveApp(APIApplication):
             'replies': replies,
             'resolved': resolved,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/comments/{commentId}"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._patch(url, data=request_body, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def list_user_sshared_drive(self, pageSize=None, pageToken=None, q=None, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def list_user_sshared_drive(self, pageSize: Optional[str] = None, pageToken: Optional[str] = None, q: Optional[str] = None, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         List user's shared drive
 
@@ -933,6 +879,10 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Shared Drive
         """
@@ -940,9 +890,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('pageSize', pageSize), ('pageToken', pageToken), ('q', q), ('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def create_ashared_drive(self, requestId=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, backgroundImageFile=None, backgroundImageLink=None, capabilities=None, colorRgb=None, createdTime=None, hidden=None, id=None, kind=None, name=None, orgUnitId=None, restrictions=None, themeId=None) -> dict[str, Any]:
+    def create_ashared_drive(self, requestId: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, backgroundImageFile: Optional[dict[str, Any]] = None, backgroundImageLink: Optional[str] = None, capabilities: Optional[dict[str, Any]] = None, colorRgb: Optional[str] = None, createdTime: Optional[str] = None, hidden: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, name: Optional[str] = None, orgUnitId: Optional[str] = None, restrictions: Optional[dict[str, Any]] = None, themeId: Optional[str] = None) -> dict[str, Any]:
         """
         Create a shared drive
 
@@ -955,9 +910,9 @@ class GoogleDriveApp(APIApplication):
             prettyPrint (string): Returns response with indentations and line breaks. Example: '<boolean>'.
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
-            backgroundImageFile (object): backgroundImageFile
+            backgroundImageFile (object): backgroundImageFile Example: {'id': '<string>', 'width': '<float>', 'xCoordinate': '<float>', 'yCoordinate': '<float>'}.
             backgroundImageLink (string): backgroundImageLink Example: '<string>'.
-            capabilities (object): capabilities
+            capabilities (object): capabilities Example: {'canAddChildren': '<boolean>', 'canChangeCopyRequiresWriterPermissionRestriction': '<boolean>', 'canChangeDomainUsersOnlyRestriction': '<boolean>', 'canChangeDriveBackground': '<boolean>', 'canChangeDriveMembersOnlyRestriction': '<boolean>', 'canChangeSharingFoldersRequiresOrganizerPermissionRestriction': '<boolean>', 'canComment': '<boolean>', 'canCopy': '<boolean>', 'canDeleteChildren': '<boolean>', 'canDeleteDrive': '<boolean>', 'canDownload': '<boolean>', 'canEdit': '<boolean>', 'canListChildren': '<boolean>', 'canManageMembers': '<boolean>', 'canReadRevisions': '<boolean>', 'canRename': '<boolean>', 'canRenameDrive': '<boolean>', 'canResetDriveRestrictions': '<boolean>', 'canShare': '<boolean>', 'canTrashChildren': '<boolean>'}.
             colorRgb (string): colorRgb Example: '<string>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             hidden (string): hidden Example: '<boolean>'.
@@ -965,65 +920,21 @@ class GoogleDriveApp(APIApplication):
             kind (string): kind Example: 'drive#drive'.
             name (string): name Example: '<string>'.
             orgUnitId (string): orgUnitId Example: '<string>'.
-            restrictions (object): restrictions
-            themeId (string): themeId
-                Example:
-                ```json
-                {
-                  "backgroundImageFile": {
-                    "id": "<string>",
-                    "width": "<float>",
-                    "xCoordinate": "<float>",
-                    "yCoordinate": "<float>"
-                  },
-                  "backgroundImageLink": "<string>",
-                  "capabilities": {
-                    "canAddChildren": "<boolean>",
-                    "canChangeCopyRequiresWriterPermissionRestriction": "<boolean>",
-                    "canChangeDomainUsersOnlyRestriction": "<boolean>",
-                    "canChangeDriveBackground": "<boolean>",
-                    "canChangeDriveMembersOnlyRestriction": "<boolean>",
-                    "canChangeSharingFoldersRequiresOrganizerPermissionRestriction": "<boolean>",
-                    "canComment": "<boolean>",
-                    "canCopy": "<boolean>",
-                    "canDeleteChildren": "<boolean>",
-                    "canDeleteDrive": "<boolean>",
-                    "canDownload": "<boolean>",
-                    "canEdit": "<boolean>",
-                    "canListChildren": "<boolean>",
-                    "canManageMembers": "<boolean>",
-                    "canReadRevisions": "<boolean>",
-                    "canRename": "<boolean>",
-                    "canRenameDrive": "<boolean>",
-                    "canResetDriveRestrictions": "<boolean>",
-                    "canShare": "<boolean>",
-                    "canTrashChildren": "<boolean>"
-                  },
-                  "colorRgb": "<string>",
-                  "createdTime": "<dateTime>",
-                  "hidden": "<boolean>",
-                  "id": "<string>",
-                  "kind": "drive#drive",
-                  "name": "<string>",
-                  "orgUnitId": "<string>",
-                  "restrictions": {
-                    "adminManagedRestrictions": "<boolean>",
-                    "copyRequiresWriterPermission": "<boolean>",
-                    "domainUsersOnly": "<boolean>",
-                    "driveMembersOnly": "<boolean>",
-                    "sharingFoldersRequiresOrganizerPermission": "<boolean>"
-                  },
-                  "themeId": "<string>"
-                }
-                ```
+            restrictions (object): restrictions Example: {'adminManagedRestrictions': '<boolean>', 'copyRequiresWriterPermission': '<boolean>', 'domainUsersOnly': '<boolean>', 'driveMembersOnly': '<boolean>', 'sharingFoldersRequiresOrganizerPermission': '<boolean>'}.
+            themeId (string): themeId Example: '<string>'.
 
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Shared Drive
         """
-        request_body = {
+        request_body_data = None
+        request_body_data = {
             'backgroundImageFile': backgroundImageFile,
             'backgroundImageLink': backgroundImageLink,
             'capabilities': capabilities,
@@ -1037,14 +948,19 @@ class GoogleDriveApp(APIApplication):
             'restrictions': restrictions,
             'themeId': themeId,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/drives"
         query_params = {k: v for k, v in [('requestId', requestId), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def get_ashared_drive_smetadata_by_id(self, driveId, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def get_ashared_drive_smetadata_by_id(self, driveId: str, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Get a shared drive's metadata by ID
 
@@ -1062,18 +978,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Shared Drive
         """
         if driveId is None:
-            raise ValueError("Missing required parameter 'driveId'")
+            raise ValueError("Missing required parameter 'driveId'.")
         url = f"{self.base_url}/drives/{driveId}"
         query_params = {k: v for k, v in [('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def permanently_delete_ashared_drive(self, driveId, allowItemDeletion=None, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> Any:
+    def permanently_delete_ashared_drive(self, driveId: str, allowItemDeletion: Optional[str] = None, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> Any:
         """
         Permanently delete a shared drive
 
@@ -1092,18 +1017,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Shared Drive
         """
         if driveId is None:
-            raise ValueError("Missing required parameter 'driveId'")
+            raise ValueError("Missing required parameter 'driveId'.")
         url = f"{self.base_url}/drives/{driveId}"
         query_params = {k: v for k, v in [('allowItemDeletion', allowItemDeletion), ('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._delete(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def update_metadata_for_ashared_drive(self, driveId, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, backgroundImageFile=None, backgroundImageLink=None, capabilities=None, colorRgb=None, createdTime=None, hidden=None, id=None, kind=None, name=None, orgUnitId=None, restrictions=None, themeId=None) -> dict[str, Any]:
+    def update_metadata_for_ashared_drive(self, driveId: str, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, backgroundImageFile: Optional[dict[str, Any]] = None, backgroundImageLink: Optional[str] = None, capabilities: Optional[dict[str, Any]] = None, colorRgb: Optional[str] = None, createdTime: Optional[str] = None, hidden: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, name: Optional[str] = None, orgUnitId: Optional[str] = None, restrictions: Optional[dict[str, Any]] = None, themeId: Optional[str] = None) -> dict[str, Any]:
         """
         Update metadata for a shared drive
 
@@ -1117,9 +1051,9 @@ class GoogleDriveApp(APIApplication):
             prettyPrint (string): Returns response with indentations and line breaks. Example: '<boolean>'.
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
-            backgroundImageFile (object): backgroundImageFile
+            backgroundImageFile (object): backgroundImageFile Example: {'id': '<string>', 'width': '<float>', 'xCoordinate': '<float>', 'yCoordinate': '<float>'}.
             backgroundImageLink (string): backgroundImageLink Example: '<string>'.
-            capabilities (object): capabilities
+            capabilities (object): capabilities Example: {'canAddChildren': '<boolean>', 'canChangeCopyRequiresWriterPermissionRestriction': '<boolean>', 'canChangeDomainUsersOnlyRestriction': '<boolean>', 'canChangeDriveBackground': '<boolean>', 'canChangeDriveMembersOnlyRestriction': '<boolean>', 'canChangeSharingFoldersRequiresOrganizerPermissionRestriction': '<boolean>', 'canComment': '<boolean>', 'canCopy': '<boolean>', 'canDeleteChildren': '<boolean>', 'canDeleteDrive': '<boolean>', 'canDownload': '<boolean>', 'canEdit': '<boolean>', 'canListChildren': '<boolean>', 'canManageMembers': '<boolean>', 'canReadRevisions': '<boolean>', 'canRename': '<boolean>', 'canRenameDrive': '<boolean>', 'canResetDriveRestrictions': '<boolean>', 'canShare': '<boolean>', 'canTrashChildren': '<boolean>'}.
             colorRgb (string): colorRgb Example: '<string>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             hidden (string): hidden Example: '<boolean>'.
@@ -1127,67 +1061,23 @@ class GoogleDriveApp(APIApplication):
             kind (string): kind Example: 'drive#drive'.
             name (string): name Example: '<string>'.
             orgUnitId (string): orgUnitId Example: '<string>'.
-            restrictions (object): restrictions
-            themeId (string): themeId
-                Example:
-                ```json
-                {
-                  "backgroundImageFile": {
-                    "id": "<string>",
-                    "width": "<float>",
-                    "xCoordinate": "<float>",
-                    "yCoordinate": "<float>"
-                  },
-                  "backgroundImageLink": "<string>",
-                  "capabilities": {
-                    "canAddChildren": "<boolean>",
-                    "canChangeCopyRequiresWriterPermissionRestriction": "<boolean>",
-                    "canChangeDomainUsersOnlyRestriction": "<boolean>",
-                    "canChangeDriveBackground": "<boolean>",
-                    "canChangeDriveMembersOnlyRestriction": "<boolean>",
-                    "canChangeSharingFoldersRequiresOrganizerPermissionRestriction": "<boolean>",
-                    "canComment": "<boolean>",
-                    "canCopy": "<boolean>",
-                    "canDeleteChildren": "<boolean>",
-                    "canDeleteDrive": "<boolean>",
-                    "canDownload": "<boolean>",
-                    "canEdit": "<boolean>",
-                    "canListChildren": "<boolean>",
-                    "canManageMembers": "<boolean>",
-                    "canReadRevisions": "<boolean>",
-                    "canRename": "<boolean>",
-                    "canRenameDrive": "<boolean>",
-                    "canResetDriveRestrictions": "<boolean>",
-                    "canShare": "<boolean>",
-                    "canTrashChildren": "<boolean>"
-                  },
-                  "colorRgb": "<string>",
-                  "createdTime": "<dateTime>",
-                  "hidden": "<boolean>",
-                  "id": "<string>",
-                  "kind": "drive#drive",
-                  "name": "<string>",
-                  "orgUnitId": "<string>",
-                  "restrictions": {
-                    "adminManagedRestrictions": "<boolean>",
-                    "copyRequiresWriterPermission": "<boolean>",
-                    "domainUsersOnly": "<boolean>",
-                    "driveMembersOnly": "<boolean>",
-                    "sharingFoldersRequiresOrganizerPermission": "<boolean>"
-                  },
-                  "themeId": "<string>"
-                }
-                ```
+            restrictions (object): restrictions Example: {'adminManagedRestrictions': '<boolean>', 'copyRequiresWriterPermission': '<boolean>', 'domainUsersOnly': '<boolean>', 'driveMembersOnly': '<boolean>', 'sharingFoldersRequiresOrganizerPermission': '<boolean>'}.
+            themeId (string): themeId Example: '<string>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Shared Drive
         """
         if driveId is None:
-            raise ValueError("Missing required parameter 'driveId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'driveId'.")
+        request_body_data = None
+        request_body_data = {
             'backgroundImageFile': backgroundImageFile,
             'backgroundImageLink': backgroundImageLink,
             'capabilities': capabilities,
@@ -1201,14 +1091,19 @@ class GoogleDriveApp(APIApplication):
             'restrictions': restrictions,
             'themeId': themeId,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/drives/{driveId}"
         query_params = {k: v for k, v in [('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._patch(url, data=request_body, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def hide_ashared_drive_from_the_default_view(self, driveId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def hide_drive_by_id_post(self, driveId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Hide a shared drive from the default view
 
@@ -1225,18 +1120,28 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Shared Drive
         """
         if driveId is None:
-            raise ValueError("Missing required parameter 'driveId'")
+            raise ValueError("Missing required parameter 'driveId'.")
+        request_body_data = None
         url = f"{self.base_url}/drives/{driveId}/hide"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data={}, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def restore_shared_drive_to_default_view(self, driveId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def unhide_drive(self, driveId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Restore shared drive to default view
 
@@ -1253,18 +1158,28 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Shared Drive
         """
         if driveId is None:
-            raise ValueError("Missing required parameter 'driveId'")
+            raise ValueError("Missing required parameter 'driveId'.")
+        request_body_data = None
         url = f"{self.base_url}/drives/{driveId}/unhide"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data={}, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def list_user_sfiles(self, corpora=None, driveId=None, includeItemsFromAllDrives=None, includeLabels=None, includePermissionsForView=None, includeTeamDriveItems=None, orderBy=None, pageSize=None, pageToken=None, q=None, spaces=None, supportsAllDrives=None, supportsTeamDrives=None, teamDriveId=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def list_user_sfiles(self, corpora: Optional[str] = None, driveId: Optional[str] = None, includeItemsFromAllDrives: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, includeTeamDriveItems: Optional[str] = None, orderBy: Optional[str] = None, pageSize: Optional[str] = None, pageToken: Optional[str] = None, q: Optional[str] = None, spaces: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, teamDriveId: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         List user's files
 
@@ -1294,6 +1209,10 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Files
         """
@@ -1301,9 +1220,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('corpora', corpora), ('driveId', driveId), ('includeItemsFromAllDrives', includeItemsFromAllDrives), ('includeLabels', includeLabels), ('includePermissionsForView', includePermissionsForView), ('includeTeamDriveItems', includeTeamDriveItems), ('orderBy', orderBy), ('pageSize', pageSize), ('pageToken', pageToken), ('q', q), ('spaces', spaces), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('teamDriveId', teamDriveId), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def create_anew_file(self, enforceSingleParent=None, ignoreDefaultVisibility=None, includeLabels=None, includePermissionsForView=None, keepRevisionForever=None, ocrLanguage=None, supportsAllDrives=None, supportsTeamDrives=None, useContentAsIndexableText=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, appProperties=None, capabilities=None, contentHints=None, contentRestrictions=None, copyRequiresWriterPermission=None, createdTime=None, description=None, driveId=None, explicitlyTrashed=None, exportLinks=None, fileExtension=None, folderColorRgb=None, fullFileExtension=None, hasAugmentedPermissions=None, hasThumbnail=None, headRevisionId=None, iconLink=None, id=None, imageMediaMetadata=None, isAppAuthorized=None, kind=None, labelInfo=None, lastModifyingUser=None, linkShareMetadata=None, md5Checksum=None, mimeType=None, modifiedByMe=None, modifiedByMeTime=None, modifiedTime=None, name=None, originalFilename=None, ownedByMe=None, owners=None, parents=None, permissionIds=None, permissions=None, properties=None, quotaBytesUsed=None, resourceKey=None, sha1Checksum=None, sha256Checksum=None, shared=None, sharedWithMeTime=None, sharingUser=None, shortcutDetails=None, size=None, spaces=None, starred=None, teamDriveId=None, thumbnailLink=None, thumbnailVersion=None, trashed=None, trashedTime=None, trashingUser=None, version=None, videoMediaMetadata=None, viewedByMe=None, viewedByMeTime=None, viewersCanCopyContent=None, webContentLink=None, webViewLink=None, writersCanShare=None) -> dict[str, Any]:
+    def create_anew_file(self, enforceSingleParent: Optional[str] = None, ignoreDefaultVisibility: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, keepRevisionForever: Optional[str] = None, ocrLanguage: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, useContentAsIndexableText: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, appProperties: Optional[dict[str, Any]] = None, capabilities: Optional[dict[str, Any]] = None, contentHints: Optional[dict[str, Any]] = None, contentRestrictions: Optional[List[dict[str, Any]]] = None, copyRequiresWriterPermission: Optional[str] = None, createdTime: Optional[str] = None, description: Optional[str] = None, driveId: Optional[str] = None, explicitlyTrashed: Optional[str] = None, exportLinks: Optional[dict[str, Any]] = None, fileExtension: Optional[str] = None, folderColorRgb: Optional[str] = None, fullFileExtension: Optional[str] = None, hasAugmentedPermissions: Optional[str] = None, hasThumbnail: Optional[str] = None, headRevisionId: Optional[str] = None, iconLink: Optional[str] = None, id: Optional[str] = None, imageMediaMetadata: Optional[dict[str, Any]] = None, isAppAuthorized: Optional[str] = None, kind: Optional[str] = None, labelInfo: Optional[dict[str, Any]] = None, lastModifyingUser: Optional[dict[str, Any]] = None, linkShareMetadata: Optional[dict[str, Any]] = None, md5Checksum: Optional[str] = None, mimeType: Optional[str] = None, modifiedByMe: Optional[str] = None, modifiedByMeTime: Optional[str] = None, modifiedTime: Optional[str] = None, name: Optional[str] = None, originalFilename: Optional[str] = None, ownedByMe: Optional[str] = None, owners: Optional[List[dict[str, Any]]] = None, parents: Optional[List[str]] = None, permissionIds: Optional[List[str]] = None, permissions: Optional[List[dict[str, Any]]] = None, properties: Optional[dict[str, Any]] = None, quotaBytesUsed: Optional[str] = None, resourceKey: Optional[str] = None, sha1Checksum: Optional[str] = None, sha256Checksum: Optional[str] = None, shared: Optional[str] = None, sharedWithMeTime: Optional[str] = None, sharingUser: Optional[dict[str, Any]] = None, shortcutDetails: Optional[dict[str, Any]] = None, size: Optional[str] = None, spaces: Optional[List[str]] = None, starred: Optional[str] = None, teamDriveId: Optional[str] = None, thumbnailLink: Optional[str] = None, thumbnailVersion: Optional[str] = None, trashed: Optional[str] = None, trashedTime: Optional[str] = None, trashingUser: Optional[dict[str, Any]] = None, version: Optional[str] = None, videoMediaMetadata: Optional[dict[str, Any]] = None, viewedByMe: Optional[str] = None, viewedByMeTime: Optional[str] = None, viewersCanCopyContent: Optional[str] = None, webContentLink: Optional[str] = None, webViewLink: Optional[str] = None, writersCanShare: Optional[str] = None) -> dict[str, Any]:
         """
         Create a new file
 
@@ -1324,16 +1248,16 @@ class GoogleDriveApp(APIApplication):
             prettyPrint (string): Returns response with indentations and line breaks. Example: '<boolean>'.
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
-            appProperties (object): appProperties
-            capabilities (object): capabilities
-            contentHints (object): contentHints
+            appProperties (object): appProperties Example: {'essef3a': '<string>', 'magna9e': '<string>'}.
+            capabilities (object): capabilities Example: {'canAcceptOwnership': '<boolean>', 'canAddChildren': '<boolean>', 'canAddFolderFromAnotherDrive': '<boolean>', 'canAddMyDriveParent': '<boolean>', 'canChangeCopyRequiresWriterPermission': '<boolean>', 'canChangeSecurityUpdateEnabled': '<boolean>', 'canChangeViewersCanCopyContent': '<boolean>', 'canComment': '<boolean>', 'canCopy': '<boolean>', 'canDelete': '<boolean>', 'canDeleteChildren': '<boolean>', 'canDownload': '<boolean>', 'canEdit': '<boolean>', 'canListChildren': '<boolean>', 'canModifyContent': '<boolean>', 'canModifyContentRestriction': '<boolean>', 'canModifyLabels': '<boolean>', 'canMoveChildrenOutOfDrive': '<boolean>', 'canMoveChildrenOutOfTeamDrive': '<boolean>', 'canMoveChildrenWithinDrive': '<boolean>', 'canMoveChildrenWithinTeamDrive': '<boolean>', 'canMoveItemIntoTeamDrive': '<boolean>', 'canMoveItemOutOfDrive': '<boolean>', 'canMoveItemOutOfTeamDrive': '<boolean>', 'canMoveItemWithinDrive': '<boolean>', 'canMoveItemWithinTeamDrive': '<boolean>', 'canMoveTeamDriveItem': '<boolean>', 'canReadDrive': '<boolean>', 'canReadLabels': '<boolean>', 'canReadRevisions': '<boolean>', 'canReadTeamDrive': '<boolean>', 'canRemoveChildren': '<boolean>', 'canRemoveMyDriveParent': '<boolean>', 'canRename': '<boolean>', 'canShare': '<boolean>', 'canTrash': '<boolean>', 'canTrashChildren': '<boolean>', 'canUntrash': '<boolean>'}.
+            contentHints (object): contentHints Example: {'indexableText': '<string>', 'thumbnail': {'image': '<string>', 'mimeType': '<string>'}}.
             contentRestrictions (array): contentRestrictions Example: "[{'readOnly': '<boolean>', 'reason': '<string>', 'restrictingUser': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'restrictionTime': '<dateTime>', 'type': '<string>'}, {'readOnly': '<boolean>', 'reason': '<string>', 'restrictingUser': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'restrictionTime': '<dateTime>', 'type': '<string>'}]".
             copyRequiresWriterPermission (string): copyRequiresWriterPermission Example: '<boolean>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             description (string): description Example: '<string>'.
             driveId (string): driveId Example: '<string>'.
             explicitlyTrashed (string): explicitlyTrashed Example: '<boolean>'.
-            exportLinks (object): exportLinks
+            exportLinks (object): exportLinks Example: {'ea2eb': '<string>'}.
             fileExtension (string): fileExtension Example: '<string>'.
             folderColorRgb (string): folderColorRgb Example: '<string>'.
             fullFileExtension (string): fullFileExtension Example: '<string>'.
@@ -1342,12 +1266,12 @@ class GoogleDriveApp(APIApplication):
             headRevisionId (string): headRevisionId Example: '<string>'.
             iconLink (string): iconLink Example: '<string>'.
             id (string): id Example: '<string>'.
-            imageMediaMetadata (object): imageMediaMetadata
+            imageMediaMetadata (object): imageMediaMetadata Example: {'aperture': '<float>', 'cameraMake': '<string>', 'cameraModel': '<string>', 'colorSpace': '<string>', 'exposureBias': '<float>', 'exposureMode': '<string>', 'exposureTime': '<float>', 'flashUsed': '<boolean>', 'focalLength': '<float>', 'height': '<integer>', 'isoSpeed': '<integer>', 'lens': '<string>', 'location': {'altitude': '<double>', 'latitude': '<double>', 'longitude': '<double>'}, 'maxApertureValue': '<float>', 'meteringMode': '<string>', 'rotation': '<integer>', 'sensor': '<string>', 'subjectDistance': '<integer>', 'time': '<string>', 'whiteBalance': '<string>', 'width': '<integer>'}.
             isAppAuthorized (string): isAppAuthorized Example: '<boolean>'.
             kind (string): kind Example: 'drive#file'.
-            labelInfo (object): labelInfo
-            lastModifyingUser (object): lastModifyingUser
-            linkShareMetadata (object): linkShareMetadata
+            labelInfo (object): labelInfo Example: {'labels': [{'fields': {'eu_9c': {'dateString': ['<date>', '<date>'], 'id': '<string>', 'integer': ['<int64>', '<int64>'], 'kind': 'drive#labelField', 'selection': ['<string>', '<string>'], 'text': ['<string>', '<string>'], 'user': [{'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}], 'valueType': '<string>'}}, 'id': '<string>', 'kind': 'drive#label', 'revisionId': '<string>'}, {'fields': {'dolor65': {'dateString': ['<date>', '<date>'], 'id': '<string>', 'integer': ['<int64>', '<int64>'], 'kind': 'drive#labelField', 'selection': ['<string>', '<string>'], 'text': ['<string>', '<string>'], 'user': [{'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}], 'valueType': '<string>'}}, 'id': '<string>', 'kind': 'drive#label', 'revisionId': '<string>'}]}.
+            lastModifyingUser (object): lastModifyingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
+            linkShareMetadata (object): linkShareMetadata Example: {'securityUpdateEligible': '<boolean>', 'securityUpdateEnabled': '<boolean>'}.
             md5Checksum (string): md5Checksum Example: '<string>'.
             mimeType (string): mimeType Example: '<string>'.
             modifiedByMe (string): modifiedByMe Example: '<boolean>'.
@@ -1360,15 +1284,15 @@ class GoogleDriveApp(APIApplication):
             parents (array): parents Example: "['<string>', '<string>']".
             permissionIds (array): permissionIds Example: "['<string>', '<string>']".
             permissions (array): permissions Example: "[{'allowFileDiscovery': '<boolean>', 'deleted': '<boolean>', 'displayName': '<string>', 'domain': '<string>', 'emailAddress': '<string>', 'expirationTime': '<dateTime>', 'id': '<string>', 'kind': 'drive#permission', 'pendingOwner': '<boolean>', 'permissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}], 'photoLink': '<string>', 'role': '<string>', 'teamDrivePermissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}], 'type': '<string>', 'view': '<string>'}, {'allowFileDiscovery': '<boolean>', 'deleted': '<boolean>', 'displayName': '<string>', 'domain': '<string>', 'emailAddress': '<string>', 'expirationTime': '<dateTime>', 'id': '<string>', 'kind': 'drive#permission', 'pendingOwner': '<boolean>', 'permissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}], 'photoLink': '<string>', 'role': '<string>', 'teamDrivePermissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}], 'type': '<string>', 'view': '<string>'}]".
-            properties (object): properties
+            properties (object): properties Example: {'eiusmod_21': '<string>', 'non3c': '<string>'}.
             quotaBytesUsed (string): quotaBytesUsed Example: '<int64>'.
             resourceKey (string): resourceKey Example: '<string>'.
             sha1Checksum (string): sha1Checksum Example: '<string>'.
             sha256Checksum (string): sha256Checksum Example: '<string>'.
             shared (string): shared Example: '<boolean>'.
             sharedWithMeTime (string): sharedWithMeTime Example: '<dateTime>'.
-            sharingUser (object): sharingUser
-            shortcutDetails (object): shortcutDetails
+            sharingUser (object): sharingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
+            shortcutDetails (object): shortcutDetails Example: {'targetId': '<string>', 'targetMimeType': '<string>', 'targetResourceKey': '<string>'}.
             size (string): size Example: '<int64>'.
             spaces (array): spaces Example: "['<string>', '<string>']".
             starred (string): starred Example: '<boolean>'.
@@ -1377,438 +1301,28 @@ class GoogleDriveApp(APIApplication):
             thumbnailVersion (string): thumbnailVersion Example: '<int64>'.
             trashed (string): trashed Example: '<boolean>'.
             trashedTime (string): trashedTime Example: '<dateTime>'.
-            trashingUser (object): trashingUser
+            trashingUser (object): trashingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
             version (string): version Example: '<int64>'.
-            videoMediaMetadata (object): videoMediaMetadata
+            videoMediaMetadata (object): videoMediaMetadata Example: {'durationMillis': '<int64>', 'height': '<integer>', 'width': '<integer>'}.
             viewedByMe (string): viewedByMe Example: '<boolean>'.
             viewedByMeTime (string): viewedByMeTime Example: '<dateTime>'.
             viewersCanCopyContent (string): viewersCanCopyContent Example: '<boolean>'.
             webContentLink (string): webContentLink Example: '<string>'.
             webViewLink (string): webViewLink Example: '<string>'.
-            writersCanShare (string): writersCanShare
-                Example:
-                ```json
-                {
-                  "appProperties": {
-                    "essef3a": "<string>",
-                    "magna9e": "<string>"
-                  },
-                  "capabilities": {
-                    "canAcceptOwnership": "<boolean>",
-                    "canAddChildren": "<boolean>",
-                    "canAddFolderFromAnotherDrive": "<boolean>",
-                    "canAddMyDriveParent": "<boolean>",
-                    "canChangeCopyRequiresWriterPermission": "<boolean>",
-                    "canChangeSecurityUpdateEnabled": "<boolean>",
-                    "canChangeViewersCanCopyContent": "<boolean>",
-                    "canComment": "<boolean>",
-                    "canCopy": "<boolean>",
-                    "canDelete": "<boolean>",
-                    "canDeleteChildren": "<boolean>",
-                    "canDownload": "<boolean>",
-                    "canEdit": "<boolean>",
-                    "canListChildren": "<boolean>",
-                    "canModifyContent": "<boolean>",
-                    "canModifyContentRestriction": "<boolean>",
-                    "canModifyLabels": "<boolean>",
-                    "canMoveChildrenOutOfDrive": "<boolean>",
-                    "canMoveChildrenOutOfTeamDrive": "<boolean>",
-                    "canMoveChildrenWithinDrive": "<boolean>",
-                    "canMoveChildrenWithinTeamDrive": "<boolean>",
-                    "canMoveItemIntoTeamDrive": "<boolean>",
-                    "canMoveItemOutOfDrive": "<boolean>",
-                    "canMoveItemOutOfTeamDrive": "<boolean>",
-                    "canMoveItemWithinDrive": "<boolean>",
-                    "canMoveItemWithinTeamDrive": "<boolean>",
-                    "canMoveTeamDriveItem": "<boolean>",
-                    "canReadDrive": "<boolean>",
-                    "canReadLabels": "<boolean>",
-                    "canReadRevisions": "<boolean>",
-                    "canReadTeamDrive": "<boolean>",
-                    "canRemoveChildren": "<boolean>",
-                    "canRemoveMyDriveParent": "<boolean>",
-                    "canRename": "<boolean>",
-                    "canShare": "<boolean>",
-                    "canTrash": "<boolean>",
-                    "canTrashChildren": "<boolean>",
-                    "canUntrash": "<boolean>"
-                  },
-                  "contentHints": {
-                    "indexableText": "<string>",
-                    "thumbnail": {
-                      "image": "<string>",
-                      "mimeType": "<string>"
-                    }
-                  },
-                  "contentRestrictions": [
-                    {
-                      "readOnly": "<boolean>",
-                      "reason": "<string>",
-                      "restrictingUser": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "restrictionTime": "<dateTime>",
-                      "type": "<string>"
-                    },
-                    {
-                      "readOnly": "<boolean>",
-                      "reason": "<string>",
-                      "restrictingUser": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "restrictionTime": "<dateTime>",
-                      "type": "<string>"
-                    }
-                  ],
-                  "copyRequiresWriterPermission": "<boolean>",
-                  "createdTime": "<dateTime>",
-                  "description": "<string>",
-                  "driveId": "<string>",
-                  "explicitlyTrashed": "<boolean>",
-                  "exportLinks": {
-                    "ea2eb": "<string>"
-                  },
-                  "fileExtension": "<string>",
-                  "folderColorRgb": "<string>",
-                  "fullFileExtension": "<string>",
-                  "hasAugmentedPermissions": "<boolean>",
-                  "hasThumbnail": "<boolean>",
-                  "headRevisionId": "<string>",
-                  "iconLink": "<string>",
-                  "id": "<string>",
-                  "imageMediaMetadata": {
-                    "aperture": "<float>",
-                    "cameraMake": "<string>",
-                    "cameraModel": "<string>",
-                    "colorSpace": "<string>",
-                    "exposureBias": "<float>",
-                    "exposureMode": "<string>",
-                    "exposureTime": "<float>",
-                    "flashUsed": "<boolean>",
-                    "focalLength": "<float>",
-                    "height": "<integer>",
-                    "isoSpeed": "<integer>",
-                    "lens": "<string>",
-                    "location": {
-                      "altitude": "<double>",
-                      "latitude": "<double>",
-                      "longitude": "<double>"
-                    },
-                    "maxApertureValue": "<float>",
-                    "meteringMode": "<string>",
-                    "rotation": "<integer>",
-                    "sensor": "<string>",
-                    "subjectDistance": "<integer>",
-                    "time": "<string>",
-                    "whiteBalance": "<string>",
-                    "width": "<integer>"
-                  },
-                  "isAppAuthorized": "<boolean>",
-                  "kind": "drive#file",
-                  "labelInfo": {
-                    "labels": [
-                      {
-                        "fields": {
-                          "eu_9c": {
-                            "dateString": [
-                              "<date>",
-                              "<date>"
-                            ],
-                            "id": "<string>",
-                            "integer": [
-                              "<int64>",
-                              "<int64>"
-                            ],
-                            "kind": "drive#labelField",
-                            "selection": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "text": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "user": [
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              },
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              }
-                            ],
-                            "valueType": "<string>"
-                          }
-                        },
-                        "id": "<string>",
-                        "kind": "drive#label",
-                        "revisionId": "<string>"
-                      },
-                      {
-                        "fields": {
-                          "dolor65": {
-                            "dateString": [
-                              "<date>",
-                              "<date>"
-                            ],
-                            "id": "<string>",
-                            "integer": [
-                              "<int64>",
-                              "<int64>"
-                            ],
-                            "kind": "drive#labelField",
-                            "selection": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "text": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "user": [
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              },
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              }
-                            ],
-                            "valueType": "<string>"
-                          }
-                        },
-                        "id": "<string>",
-                        "kind": "drive#label",
-                        "revisionId": "<string>"
-                      }
-                    ]
-                  },
-                  "lastModifyingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "linkShareMetadata": {
-                    "securityUpdateEligible": "<boolean>",
-                    "securityUpdateEnabled": "<boolean>"
-                  },
-                  "md5Checksum": "<string>",
-                  "mimeType": "<string>",
-                  "modifiedByMe": "<boolean>",
-                  "modifiedByMeTime": "<dateTime>",
-                  "modifiedTime": "<dateTime>",
-                  "name": "<string>",
-                  "originalFilename": "<string>",
-                  "ownedByMe": "<boolean>",
-                  "owners": [
-                    {
-                      "displayName": "<string>",
-                      "emailAddress": "<string>",
-                      "kind": "drive#user",
-                      "me": "<boolean>",
-                      "permissionId": "<string>",
-                      "photoLink": "<string>"
-                    },
-                    {
-                      "displayName": "<string>",
-                      "emailAddress": "<string>",
-                      "kind": "drive#user",
-                      "me": "<boolean>",
-                      "permissionId": "<string>",
-                      "photoLink": "<string>"
-                    }
-                  ],
-                  "parents": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "permissionIds": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "permissions": [
-                    {
-                      "allowFileDiscovery": "<boolean>",
-                      "deleted": "<boolean>",
-                      "displayName": "<string>",
-                      "domain": "<string>",
-                      "emailAddress": "<string>",
-                      "expirationTime": "<dateTime>",
-                      "id": "<string>",
-                      "kind": "drive#permission",
-                      "pendingOwner": "<boolean>",
-                      "permissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        }
-                      ],
-                      "photoLink": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        }
-                      ],
-                      "type": "<string>",
-                      "view": "<string>"
-                    },
-                    {
-                      "allowFileDiscovery": "<boolean>",
-                      "deleted": "<boolean>",
-                      "displayName": "<string>",
-                      "domain": "<string>",
-                      "emailAddress": "<string>",
-                      "expirationTime": "<dateTime>",
-                      "id": "<string>",
-                      "kind": "drive#permission",
-                      "pendingOwner": "<boolean>",
-                      "permissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        }
-                      ],
-                      "photoLink": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        }
-                      ],
-                      "type": "<string>",
-                      "view": "<string>"
-                    }
-                  ],
-                  "properties": {
-                    "eiusmod_21": "<string>",
-                    "non3c": "<string>"
-                  },
-                  "quotaBytesUsed": "<int64>",
-                  "resourceKey": "<string>",
-                  "sha1Checksum": "<string>",
-                  "sha256Checksum": "<string>",
-                  "shared": "<boolean>",
-                  "sharedWithMeTime": "<dateTime>",
-                  "sharingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "shortcutDetails": {
-                    "targetId": "<string>",
-                    "targetMimeType": "<string>",
-                    "targetResourceKey": "<string>"
-                  },
-                  "size": "<int64>",
-                  "spaces": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "starred": "<boolean>",
-                  "teamDriveId": "<string>",
-                  "thumbnailLink": "<string>",
-                  "thumbnailVersion": "<int64>",
-                  "trashed": "<boolean>",
-                  "trashedTime": "<dateTime>",
-                  "trashingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "version": "<int64>",
-                  "videoMediaMetadata": {
-                    "durationMillis": "<int64>",
-                    "height": "<integer>",
-                    "width": "<integer>"
-                  },
-                  "viewedByMe": "<boolean>",
-                  "viewedByMeTime": "<dateTime>",
-                  "viewersCanCopyContent": "<boolean>",
-                  "webContentLink": "<string>",
-                  "webViewLink": "<string>",
-                  "writersCanShare": "<boolean>"
-                }
-                ```
+            writersCanShare (string): writersCanShare Example: '<boolean>'.
 
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Files
         """
-        request_body = {
+        request_body_data = None
+        request_body_data = {
             'appProperties': appProperties,
             'capabilities': capabilities,
             'contentHints': contentHints,
@@ -1872,14 +1386,19 @@ class GoogleDriveApp(APIApplication):
             'webViewLink': webViewLink,
             'writersCanShare': writersCanShare,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files"
         query_params = {k: v for k, v in [('enforceSingleParent', enforceSingleParent), ('ignoreDefaultVisibility', ignoreDefaultVisibility), ('includeLabels', includeLabels), ('includePermissionsForView', includePermissionsForView), ('keepRevisionForever', keepRevisionForever), ('ocrLanguage', ocrLanguage), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('useContentAsIndexableText', useContentAsIndexableText), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def generate_aset_of_file_ids(self, count=None, space=None, type=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def generate_aset_of_file_ids(self, count: Optional[str] = None, space: Optional[str] = None, type: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Generate a set of file IDs
 
@@ -1898,6 +1417,10 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Files
         """
@@ -1905,9 +1428,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('count', count), ('space', space), ('type', type), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def permanently_delete_all_of_the_trashed_files(self, driveId=None, enforceSingleParent=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> Any:
+    def empty_trash_files(self, driveId: Optional[str] = None, enforceSingleParent: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> Any:
         """
         Permanently delete all of the trashed files
 
@@ -1925,6 +1453,10 @@ class GoogleDriveApp(APIApplication):
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Files
         """
@@ -1932,9 +1464,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('driveId', driveId), ('enforceSingleParent', enforceSingleParent), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._delete(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def get_afile_smetadata_or_content_by_id(self, fileId, acknowledgeAbuse=None, includeLabels=None, includePermissionsForView=None, supportsAllDrives=None, supportsTeamDrives=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def get_afile_smetadata_or_content_by_id(self, fileId: str, acknowledgeAbuse: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Get a file's metadata or content by ID
 
@@ -1956,18 +1493,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Files
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         url = f"{self.base_url}/files/{fileId}"
         query_params = {k: v for k, v in [('acknowledgeAbuse', acknowledgeAbuse), ('includeLabels', includeLabels), ('includePermissionsForView', includePermissionsForView), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def permanently_delete_afile_without_moving_it_to_the_trash(self, fileId, enforceSingleParent=None, supportsAllDrives=None, supportsTeamDrives=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> Any:
+    def delete_file_by_id(self, fileId: str, enforceSingleParent: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> Any:
         """
         Permanently delete a file without moving it to the trash
 
@@ -1987,18 +1533,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Files
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         url = f"{self.base_url}/files/{fileId}"
         query_params = {k: v for k, v in [('enforceSingleParent', enforceSingleParent), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._delete(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def update_afile_smetadata_and_or_content(self, fileId, addParents=None, enforceSingleParent=None, includeLabels=None, includePermissionsForView=None, keepRevisionForever=None, ocrLanguage=None, removeParents=None, supportsAllDrives=None, supportsTeamDrives=None, useContentAsIndexableText=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, appProperties=None, capabilities=None, contentHints=None, contentRestrictions=None, copyRequiresWriterPermission=None, createdTime=None, description=None, driveId=None, explicitlyTrashed=None, exportLinks=None, fileExtension=None, folderColorRgb=None, fullFileExtension=None, hasAugmentedPermissions=None, hasThumbnail=None, headRevisionId=None, iconLink=None, id=None, imageMediaMetadata=None, isAppAuthorized=None, kind=None, labelInfo=None, lastModifyingUser=None, linkShareMetadata=None, md5Checksum=None, mimeType=None, modifiedByMe=None, modifiedByMeTime=None, modifiedTime=None, name=None, originalFilename=None, ownedByMe=None, owners=None, parents=None, permissionIds=None, permissions=None, properties=None, quotaBytesUsed=None, resourceKey=None, sha1Checksum=None, sha256Checksum=None, shared=None, sharedWithMeTime=None, sharingUser=None, shortcutDetails=None, size=None, spaces=None, starred=None, teamDriveId=None, thumbnailLink=None, thumbnailVersion=None, trashed=None, trashedTime=None, trashingUser=None, version=None, videoMediaMetadata=None, viewedByMe=None, viewedByMeTime=None, viewersCanCopyContent=None, webContentLink=None, webViewLink=None, writersCanShare=None) -> dict[str, Any]:
+    def update_file(self, fileId: str, addParents: Optional[str] = None, enforceSingleParent: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, keepRevisionForever: Optional[str] = None, ocrLanguage: Optional[str] = None, removeParents: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, useContentAsIndexableText: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, appProperties: Optional[dict[str, Any]] = None, capabilities: Optional[dict[str, Any]] = None, contentHints: Optional[dict[str, Any]] = None, contentRestrictions: Optional[List[dict[str, Any]]] = None, copyRequiresWriterPermission: Optional[str] = None, createdTime: Optional[str] = None, description: Optional[str] = None, driveId: Optional[str] = None, explicitlyTrashed: Optional[str] = None, exportLinks: Optional[dict[str, Any]] = None, fileExtension: Optional[str] = None, folderColorRgb: Optional[str] = None, fullFileExtension: Optional[str] = None, hasAugmentedPermissions: Optional[str] = None, hasThumbnail: Optional[str] = None, headRevisionId: Optional[str] = None, iconLink: Optional[str] = None, id: Optional[str] = None, imageMediaMetadata: Optional[dict[str, Any]] = None, isAppAuthorized: Optional[str] = None, kind: Optional[str] = None, labelInfo: Optional[dict[str, Any]] = None, lastModifyingUser: Optional[dict[str, Any]] = None, linkShareMetadata: Optional[dict[str, Any]] = None, md5Checksum: Optional[str] = None, mimeType: Optional[str] = None, modifiedByMe: Optional[str] = None, modifiedByMeTime: Optional[str] = None, modifiedTime: Optional[str] = None, name: Optional[str] = None, originalFilename: Optional[str] = None, ownedByMe: Optional[str] = None, owners: Optional[List[dict[str, Any]]] = None, parents: Optional[List[str]] = None, permissionIds: Optional[List[str]] = None, permissions: Optional[List[dict[str, Any]]] = None, properties: Optional[dict[str, Any]] = None, quotaBytesUsed: Optional[str] = None, resourceKey: Optional[str] = None, sha1Checksum: Optional[str] = None, sha256Checksum: Optional[str] = None, shared: Optional[str] = None, sharedWithMeTime: Optional[str] = None, sharingUser: Optional[dict[str, Any]] = None, shortcutDetails: Optional[dict[str, Any]] = None, size: Optional[str] = None, spaces: Optional[List[str]] = None, starred: Optional[str] = None, teamDriveId: Optional[str] = None, thumbnailLink: Optional[str] = None, thumbnailVersion: Optional[str] = None, trashed: Optional[str] = None, trashedTime: Optional[str] = None, trashingUser: Optional[dict[str, Any]] = None, version: Optional[str] = None, videoMediaMetadata: Optional[dict[str, Any]] = None, viewedByMe: Optional[str] = None, viewedByMeTime: Optional[str] = None, viewersCanCopyContent: Optional[str] = None, webContentLink: Optional[str] = None, webViewLink: Optional[str] = None, writersCanShare: Optional[str] = None) -> dict[str, Any]:
         """
         Update a file's metadata and/or content
 
@@ -2021,16 +1576,16 @@ class GoogleDriveApp(APIApplication):
             prettyPrint (string): Returns response with indentations and line breaks. Example: '<boolean>'.
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
-            appProperties (object): appProperties
-            capabilities (object): capabilities
-            contentHints (object): contentHints
+            appProperties (object): appProperties Example: {'essef3a': '<string>', 'magna9e': '<string>'}.
+            capabilities (object): capabilities Example: {'canAcceptOwnership': '<boolean>', 'canAddChildren': '<boolean>', 'canAddFolderFromAnotherDrive': '<boolean>', 'canAddMyDriveParent': '<boolean>', 'canChangeCopyRequiresWriterPermission': '<boolean>', 'canChangeSecurityUpdateEnabled': '<boolean>', 'canChangeViewersCanCopyContent': '<boolean>', 'canComment': '<boolean>', 'canCopy': '<boolean>', 'canDelete': '<boolean>', 'canDeleteChildren': '<boolean>', 'canDownload': '<boolean>', 'canEdit': '<boolean>', 'canListChildren': '<boolean>', 'canModifyContent': '<boolean>', 'canModifyContentRestriction': '<boolean>', 'canModifyLabels': '<boolean>', 'canMoveChildrenOutOfDrive': '<boolean>', 'canMoveChildrenOutOfTeamDrive': '<boolean>', 'canMoveChildrenWithinDrive': '<boolean>', 'canMoveChildrenWithinTeamDrive': '<boolean>', 'canMoveItemIntoTeamDrive': '<boolean>', 'canMoveItemOutOfDrive': '<boolean>', 'canMoveItemOutOfTeamDrive': '<boolean>', 'canMoveItemWithinDrive': '<boolean>', 'canMoveItemWithinTeamDrive': '<boolean>', 'canMoveTeamDriveItem': '<boolean>', 'canReadDrive': '<boolean>', 'canReadLabels': '<boolean>', 'canReadRevisions': '<boolean>', 'canReadTeamDrive': '<boolean>', 'canRemoveChildren': '<boolean>', 'canRemoveMyDriveParent': '<boolean>', 'canRename': '<boolean>', 'canShare': '<boolean>', 'canTrash': '<boolean>', 'canTrashChildren': '<boolean>', 'canUntrash': '<boolean>'}.
+            contentHints (object): contentHints Example: {'indexableText': '<string>', 'thumbnail': {'image': '<string>', 'mimeType': '<string>'}}.
             contentRestrictions (array): contentRestrictions Example: "[{'readOnly': '<boolean>', 'reason': '<string>', 'restrictingUser': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'restrictionTime': '<dateTime>', 'type': '<string>'}, {'readOnly': '<boolean>', 'reason': '<string>', 'restrictingUser': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'restrictionTime': '<dateTime>', 'type': '<string>'}]".
             copyRequiresWriterPermission (string): copyRequiresWriterPermission Example: '<boolean>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             description (string): description Example: '<string>'.
             driveId (string): driveId Example: '<string>'.
             explicitlyTrashed (string): explicitlyTrashed Example: '<boolean>'.
-            exportLinks (object): exportLinks
+            exportLinks (object): exportLinks Example: {'ea2eb': '<string>'}.
             fileExtension (string): fileExtension Example: '<string>'.
             folderColorRgb (string): folderColorRgb Example: '<string>'.
             fullFileExtension (string): fullFileExtension Example: '<string>'.
@@ -2039,12 +1594,12 @@ class GoogleDriveApp(APIApplication):
             headRevisionId (string): headRevisionId Example: '<string>'.
             iconLink (string): iconLink Example: '<string>'.
             id (string): id Example: '<string>'.
-            imageMediaMetadata (object): imageMediaMetadata
+            imageMediaMetadata (object): imageMediaMetadata Example: {'aperture': '<float>', 'cameraMake': '<string>', 'cameraModel': '<string>', 'colorSpace': '<string>', 'exposureBias': '<float>', 'exposureMode': '<string>', 'exposureTime': '<float>', 'flashUsed': '<boolean>', 'focalLength': '<float>', 'height': '<integer>', 'isoSpeed': '<integer>', 'lens': '<string>', 'location': {'altitude': '<double>', 'latitude': '<double>', 'longitude': '<double>'}, 'maxApertureValue': '<float>', 'meteringMode': '<string>', 'rotation': '<integer>', 'sensor': '<string>', 'subjectDistance': '<integer>', 'time': '<string>', 'whiteBalance': '<string>', 'width': '<integer>'}.
             isAppAuthorized (string): isAppAuthorized Example: '<boolean>'.
             kind (string): kind Example: 'drive#file'.
-            labelInfo (object): labelInfo
-            lastModifyingUser (object): lastModifyingUser
-            linkShareMetadata (object): linkShareMetadata
+            labelInfo (object): labelInfo Example: {'labels': [{'fields': {'eu_9c': {'dateString': ['<date>', '<date>'], 'id': '<string>', 'integer': ['<int64>', '<int64>'], 'kind': 'drive#labelField', 'selection': ['<string>', '<string>'], 'text': ['<string>', '<string>'], 'user': [{'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}], 'valueType': '<string>'}}, 'id': '<string>', 'kind': 'drive#label', 'revisionId': '<string>'}, {'fields': {'dolor65': {'dateString': ['<date>', '<date>'], 'id': '<string>', 'integer': ['<int64>', '<int64>'], 'kind': 'drive#labelField', 'selection': ['<string>', '<string>'], 'text': ['<string>', '<string>'], 'user': [{'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}], 'valueType': '<string>'}}, 'id': '<string>', 'kind': 'drive#label', 'revisionId': '<string>'}]}.
+            lastModifyingUser (object): lastModifyingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
+            linkShareMetadata (object): linkShareMetadata Example: {'securityUpdateEligible': '<boolean>', 'securityUpdateEnabled': '<boolean>'}.
             md5Checksum (string): md5Checksum Example: '<string>'.
             mimeType (string): mimeType Example: '<string>'.
             modifiedByMe (string): modifiedByMe Example: '<boolean>'.
@@ -2057,15 +1612,15 @@ class GoogleDriveApp(APIApplication):
             parents (array): parents Example: "['<string>', '<string>']".
             permissionIds (array): permissionIds Example: "['<string>', '<string>']".
             permissions (array): permissions Example: "[{'allowFileDiscovery': '<boolean>', 'deleted': '<boolean>', 'displayName': '<string>', 'domain': '<string>', 'emailAddress': '<string>', 'expirationTime': '<dateTime>', 'id': '<string>', 'kind': 'drive#permission', 'pendingOwner': '<boolean>', 'permissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}], 'photoLink': '<string>', 'role': '<string>', 'teamDrivePermissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}], 'type': '<string>', 'view': '<string>'}, {'allowFileDiscovery': '<boolean>', 'deleted': '<boolean>', 'displayName': '<string>', 'domain': '<string>', 'emailAddress': '<string>', 'expirationTime': '<dateTime>', 'id': '<string>', 'kind': 'drive#permission', 'pendingOwner': '<boolean>', 'permissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}], 'photoLink': '<string>', 'role': '<string>', 'teamDrivePermissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}], 'type': '<string>', 'view': '<string>'}]".
-            properties (object): properties
+            properties (object): properties Example: {'eiusmod_21': '<string>', 'non3c': '<string>'}.
             quotaBytesUsed (string): quotaBytesUsed Example: '<int64>'.
             resourceKey (string): resourceKey Example: '<string>'.
             sha1Checksum (string): sha1Checksum Example: '<string>'.
             sha256Checksum (string): sha256Checksum Example: '<string>'.
             shared (string): shared Example: '<boolean>'.
             sharedWithMeTime (string): sharedWithMeTime Example: '<dateTime>'.
-            sharingUser (object): sharingUser
-            shortcutDetails (object): shortcutDetails
+            sharingUser (object): sharingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
+            shortcutDetails (object): shortcutDetails Example: {'targetId': '<string>', 'targetMimeType': '<string>', 'targetResourceKey': '<string>'}.
             size (string): size Example: '<int64>'.
             spaces (array): spaces Example: "['<string>', '<string>']".
             starred (string): starred Example: '<boolean>'.
@@ -2074,440 +1629,30 @@ class GoogleDriveApp(APIApplication):
             thumbnailVersion (string): thumbnailVersion Example: '<int64>'.
             trashed (string): trashed Example: '<boolean>'.
             trashedTime (string): trashedTime Example: '<dateTime>'.
-            trashingUser (object): trashingUser
+            trashingUser (object): trashingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
             version (string): version Example: '<int64>'.
-            videoMediaMetadata (object): videoMediaMetadata
+            videoMediaMetadata (object): videoMediaMetadata Example: {'durationMillis': '<int64>', 'height': '<integer>', 'width': '<integer>'}.
             viewedByMe (string): viewedByMe Example: '<boolean>'.
             viewedByMeTime (string): viewedByMeTime Example: '<dateTime>'.
             viewersCanCopyContent (string): viewersCanCopyContent Example: '<boolean>'.
             webContentLink (string): webContentLink Example: '<string>'.
             webViewLink (string): webViewLink Example: '<string>'.
-            writersCanShare (string): writersCanShare
-                Example:
-                ```json
-                {
-                  "appProperties": {
-                    "essef3a": "<string>",
-                    "magna9e": "<string>"
-                  },
-                  "capabilities": {
-                    "canAcceptOwnership": "<boolean>",
-                    "canAddChildren": "<boolean>",
-                    "canAddFolderFromAnotherDrive": "<boolean>",
-                    "canAddMyDriveParent": "<boolean>",
-                    "canChangeCopyRequiresWriterPermission": "<boolean>",
-                    "canChangeSecurityUpdateEnabled": "<boolean>",
-                    "canChangeViewersCanCopyContent": "<boolean>",
-                    "canComment": "<boolean>",
-                    "canCopy": "<boolean>",
-                    "canDelete": "<boolean>",
-                    "canDeleteChildren": "<boolean>",
-                    "canDownload": "<boolean>",
-                    "canEdit": "<boolean>",
-                    "canListChildren": "<boolean>",
-                    "canModifyContent": "<boolean>",
-                    "canModifyContentRestriction": "<boolean>",
-                    "canModifyLabels": "<boolean>",
-                    "canMoveChildrenOutOfDrive": "<boolean>",
-                    "canMoveChildrenOutOfTeamDrive": "<boolean>",
-                    "canMoveChildrenWithinDrive": "<boolean>",
-                    "canMoveChildrenWithinTeamDrive": "<boolean>",
-                    "canMoveItemIntoTeamDrive": "<boolean>",
-                    "canMoveItemOutOfDrive": "<boolean>",
-                    "canMoveItemOutOfTeamDrive": "<boolean>",
-                    "canMoveItemWithinDrive": "<boolean>",
-                    "canMoveItemWithinTeamDrive": "<boolean>",
-                    "canMoveTeamDriveItem": "<boolean>",
-                    "canReadDrive": "<boolean>",
-                    "canReadLabels": "<boolean>",
-                    "canReadRevisions": "<boolean>",
-                    "canReadTeamDrive": "<boolean>",
-                    "canRemoveChildren": "<boolean>",
-                    "canRemoveMyDriveParent": "<boolean>",
-                    "canRename": "<boolean>",
-                    "canShare": "<boolean>",
-                    "canTrash": "<boolean>",
-                    "canTrashChildren": "<boolean>",
-                    "canUntrash": "<boolean>"
-                  },
-                  "contentHints": {
-                    "indexableText": "<string>",
-                    "thumbnail": {
-                      "image": "<string>",
-                      "mimeType": "<string>"
-                    }
-                  },
-                  "contentRestrictions": [
-                    {
-                      "readOnly": "<boolean>",
-                      "reason": "<string>",
-                      "restrictingUser": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "restrictionTime": "<dateTime>",
-                      "type": "<string>"
-                    },
-                    {
-                      "readOnly": "<boolean>",
-                      "reason": "<string>",
-                      "restrictingUser": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "restrictionTime": "<dateTime>",
-                      "type": "<string>"
-                    }
-                  ],
-                  "copyRequiresWriterPermission": "<boolean>",
-                  "createdTime": "<dateTime>",
-                  "description": "<string>",
-                  "driveId": "<string>",
-                  "explicitlyTrashed": "<boolean>",
-                  "exportLinks": {
-                    "ea2eb": "<string>"
-                  },
-                  "fileExtension": "<string>",
-                  "folderColorRgb": "<string>",
-                  "fullFileExtension": "<string>",
-                  "hasAugmentedPermissions": "<boolean>",
-                  "hasThumbnail": "<boolean>",
-                  "headRevisionId": "<string>",
-                  "iconLink": "<string>",
-                  "id": "<string>",
-                  "imageMediaMetadata": {
-                    "aperture": "<float>",
-                    "cameraMake": "<string>",
-                    "cameraModel": "<string>",
-                    "colorSpace": "<string>",
-                    "exposureBias": "<float>",
-                    "exposureMode": "<string>",
-                    "exposureTime": "<float>",
-                    "flashUsed": "<boolean>",
-                    "focalLength": "<float>",
-                    "height": "<integer>",
-                    "isoSpeed": "<integer>",
-                    "lens": "<string>",
-                    "location": {
-                      "altitude": "<double>",
-                      "latitude": "<double>",
-                      "longitude": "<double>"
-                    },
-                    "maxApertureValue": "<float>",
-                    "meteringMode": "<string>",
-                    "rotation": "<integer>",
-                    "sensor": "<string>",
-                    "subjectDistance": "<integer>",
-                    "time": "<string>",
-                    "whiteBalance": "<string>",
-                    "width": "<integer>"
-                  },
-                  "isAppAuthorized": "<boolean>",
-                  "kind": "drive#file",
-                  "labelInfo": {
-                    "labels": [
-                      {
-                        "fields": {
-                          "eu_9c": {
-                            "dateString": [
-                              "<date>",
-                              "<date>"
-                            ],
-                            "id": "<string>",
-                            "integer": [
-                              "<int64>",
-                              "<int64>"
-                            ],
-                            "kind": "drive#labelField",
-                            "selection": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "text": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "user": [
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              },
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              }
-                            ],
-                            "valueType": "<string>"
-                          }
-                        },
-                        "id": "<string>",
-                        "kind": "drive#label",
-                        "revisionId": "<string>"
-                      },
-                      {
-                        "fields": {
-                          "dolor65": {
-                            "dateString": [
-                              "<date>",
-                              "<date>"
-                            ],
-                            "id": "<string>",
-                            "integer": [
-                              "<int64>",
-                              "<int64>"
-                            ],
-                            "kind": "drive#labelField",
-                            "selection": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "text": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "user": [
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              },
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              }
-                            ],
-                            "valueType": "<string>"
-                          }
-                        },
-                        "id": "<string>",
-                        "kind": "drive#label",
-                        "revisionId": "<string>"
-                      }
-                    ]
-                  },
-                  "lastModifyingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "linkShareMetadata": {
-                    "securityUpdateEligible": "<boolean>",
-                    "securityUpdateEnabled": "<boolean>"
-                  },
-                  "md5Checksum": "<string>",
-                  "mimeType": "<string>",
-                  "modifiedByMe": "<boolean>",
-                  "modifiedByMeTime": "<dateTime>",
-                  "modifiedTime": "<dateTime>",
-                  "name": "<string>",
-                  "originalFilename": "<string>",
-                  "ownedByMe": "<boolean>",
-                  "owners": [
-                    {
-                      "displayName": "<string>",
-                      "emailAddress": "<string>",
-                      "kind": "drive#user",
-                      "me": "<boolean>",
-                      "permissionId": "<string>",
-                      "photoLink": "<string>"
-                    },
-                    {
-                      "displayName": "<string>",
-                      "emailAddress": "<string>",
-                      "kind": "drive#user",
-                      "me": "<boolean>",
-                      "permissionId": "<string>",
-                      "photoLink": "<string>"
-                    }
-                  ],
-                  "parents": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "permissionIds": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "permissions": [
-                    {
-                      "allowFileDiscovery": "<boolean>",
-                      "deleted": "<boolean>",
-                      "displayName": "<string>",
-                      "domain": "<string>",
-                      "emailAddress": "<string>",
-                      "expirationTime": "<dateTime>",
-                      "id": "<string>",
-                      "kind": "drive#permission",
-                      "pendingOwner": "<boolean>",
-                      "permissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        }
-                      ],
-                      "photoLink": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        }
-                      ],
-                      "type": "<string>",
-                      "view": "<string>"
-                    },
-                    {
-                      "allowFileDiscovery": "<boolean>",
-                      "deleted": "<boolean>",
-                      "displayName": "<string>",
-                      "domain": "<string>",
-                      "emailAddress": "<string>",
-                      "expirationTime": "<dateTime>",
-                      "id": "<string>",
-                      "kind": "drive#permission",
-                      "pendingOwner": "<boolean>",
-                      "permissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        }
-                      ],
-                      "photoLink": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        }
-                      ],
-                      "type": "<string>",
-                      "view": "<string>"
-                    }
-                  ],
-                  "properties": {
-                    "eiusmod_21": "<string>",
-                    "non3c": "<string>"
-                  },
-                  "quotaBytesUsed": "<int64>",
-                  "resourceKey": "<string>",
-                  "sha1Checksum": "<string>",
-                  "sha256Checksum": "<string>",
-                  "shared": "<boolean>",
-                  "sharedWithMeTime": "<dateTime>",
-                  "sharingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "shortcutDetails": {
-                    "targetId": "<string>",
-                    "targetMimeType": "<string>",
-                    "targetResourceKey": "<string>"
-                  },
-                  "size": "<int64>",
-                  "spaces": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "starred": "<boolean>",
-                  "teamDriveId": "<string>",
-                  "thumbnailLink": "<string>",
-                  "thumbnailVersion": "<int64>",
-                  "trashed": "<boolean>",
-                  "trashedTime": "<dateTime>",
-                  "trashingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "version": "<int64>",
-                  "videoMediaMetadata": {
-                    "durationMillis": "<int64>",
-                    "height": "<integer>",
-                    "width": "<integer>"
-                  },
-                  "viewedByMe": "<boolean>",
-                  "viewedByMeTime": "<dateTime>",
-                  "viewersCanCopyContent": "<boolean>",
-                  "webContentLink": "<string>",
-                  "webViewLink": "<string>",
-                  "writersCanShare": "<boolean>"
-                }
-                ```
+            writersCanShare (string): writersCanShare Example: '<boolean>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Files
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'fileId'.")
+        request_body_data = None
+        request_body_data = {
             'appProperties': appProperties,
             'capabilities': capabilities,
             'contentHints': contentHints,
@@ -2571,14 +1716,19 @@ class GoogleDriveApp(APIApplication):
             'webViewLink': webViewLink,
             'writersCanShare': writersCanShare,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}"
         query_params = {k: v for k, v in [('addParents', addParents), ('enforceSingleParent', enforceSingleParent), ('includeLabels', includeLabels), ('includePermissionsForView', includePermissionsForView), ('keepRevisionForever', keepRevisionForever), ('ocrLanguage', ocrLanguage), ('removeParents', removeParents), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('useContentAsIndexableText', useContentAsIndexableText), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._patch(url, data=request_body, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def create_acopy_of_afile_and_apply_any_requested_update(self, fileId, enforceSingleParent=None, ignoreDefaultVisibility=None, includeLabels=None, includePermissionsForView=None, keepRevisionForever=None, ocrLanguage=None, supportsAllDrives=None, supportsTeamDrives=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, appProperties=None, capabilities=None, contentHints=None, contentRestrictions=None, copyRequiresWriterPermission=None, createdTime=None, description=None, driveId=None, explicitlyTrashed=None, exportLinks=None, fileExtension=None, folderColorRgb=None, fullFileExtension=None, hasAugmentedPermissions=None, hasThumbnail=None, headRevisionId=None, iconLink=None, id=None, imageMediaMetadata=None, isAppAuthorized=None, kind=None, labelInfo=None, lastModifyingUser=None, linkShareMetadata=None, md5Checksum=None, mimeType=None, modifiedByMe=None, modifiedByMeTime=None, modifiedTime=None, name=None, originalFilename=None, ownedByMe=None, owners=None, parents=None, permissionIds=None, permissions=None, properties=None, quotaBytesUsed=None, resourceKey=None, sha1Checksum=None, sha256Checksum=None, shared=None, sharedWithMeTime=None, sharingUser=None, shortcutDetails=None, size=None, spaces=None, starred=None, teamDriveId=None, thumbnailLink=None, thumbnailVersion=None, trashed=None, trashedTime=None, trashingUser=None, version=None, videoMediaMetadata=None, viewedByMe=None, viewedByMeTime=None, viewersCanCopyContent=None, webContentLink=None, webViewLink=None, writersCanShare=None) -> dict[str, Any]:
+    def copy_file_by_id(self, fileId: str, enforceSingleParent: Optional[str] = None, ignoreDefaultVisibility: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, keepRevisionForever: Optional[str] = None, ocrLanguage: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, appProperties: Optional[dict[str, Any]] = None, capabilities: Optional[dict[str, Any]] = None, contentHints: Optional[dict[str, Any]] = None, contentRestrictions: Optional[List[dict[str, Any]]] = None, copyRequiresWriterPermission: Optional[str] = None, createdTime: Optional[str] = None, description: Optional[str] = None, driveId: Optional[str] = None, explicitlyTrashed: Optional[str] = None, exportLinks: Optional[dict[str, Any]] = None, fileExtension: Optional[str] = None, folderColorRgb: Optional[str] = None, fullFileExtension: Optional[str] = None, hasAugmentedPermissions: Optional[str] = None, hasThumbnail: Optional[str] = None, headRevisionId: Optional[str] = None, iconLink: Optional[str] = None, id: Optional[str] = None, imageMediaMetadata: Optional[dict[str, Any]] = None, isAppAuthorized: Optional[str] = None, kind: Optional[str] = None, labelInfo: Optional[dict[str, Any]] = None, lastModifyingUser: Optional[dict[str, Any]] = None, linkShareMetadata: Optional[dict[str, Any]] = None, md5Checksum: Optional[str] = None, mimeType: Optional[str] = None, modifiedByMe: Optional[str] = None, modifiedByMeTime: Optional[str] = None, modifiedTime: Optional[str] = None, name: Optional[str] = None, originalFilename: Optional[str] = None, ownedByMe: Optional[str] = None, owners: Optional[List[dict[str, Any]]] = None, parents: Optional[List[str]] = None, permissionIds: Optional[List[str]] = None, permissions: Optional[List[dict[str, Any]]] = None, properties: Optional[dict[str, Any]] = None, quotaBytesUsed: Optional[str] = None, resourceKey: Optional[str] = None, sha1Checksum: Optional[str] = None, sha256Checksum: Optional[str] = None, shared: Optional[str] = None, sharedWithMeTime: Optional[str] = None, sharingUser: Optional[dict[str, Any]] = None, shortcutDetails: Optional[dict[str, Any]] = None, size: Optional[str] = None, spaces: Optional[List[str]] = None, starred: Optional[str] = None, teamDriveId: Optional[str] = None, thumbnailLink: Optional[str] = None, thumbnailVersion: Optional[str] = None, trashed: Optional[str] = None, trashedTime: Optional[str] = None, trashingUser: Optional[dict[str, Any]] = None, version: Optional[str] = None, videoMediaMetadata: Optional[dict[str, Any]] = None, viewedByMe: Optional[str] = None, viewedByMeTime: Optional[str] = None, viewersCanCopyContent: Optional[str] = None, webContentLink: Optional[str] = None, webViewLink: Optional[str] = None, writersCanShare: Optional[str] = None) -> dict[str, Any]:
         """
         Create a copy of a file and apply any requested update
 
@@ -2599,16 +1749,16 @@ class GoogleDriveApp(APIApplication):
             prettyPrint (string): Returns response with indentations and line breaks. Example: '<boolean>'.
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
-            appProperties (object): appProperties
-            capabilities (object): capabilities
-            contentHints (object): contentHints
+            appProperties (object): appProperties Example: {'essef3a': '<string>', 'magna9e': '<string>'}.
+            capabilities (object): capabilities Example: {'canAcceptOwnership': '<boolean>', 'canAddChildren': '<boolean>', 'canAddFolderFromAnotherDrive': '<boolean>', 'canAddMyDriveParent': '<boolean>', 'canChangeCopyRequiresWriterPermission': '<boolean>', 'canChangeSecurityUpdateEnabled': '<boolean>', 'canChangeViewersCanCopyContent': '<boolean>', 'canComment': '<boolean>', 'canCopy': '<boolean>', 'canDelete': '<boolean>', 'canDeleteChildren': '<boolean>', 'canDownload': '<boolean>', 'canEdit': '<boolean>', 'canListChildren': '<boolean>', 'canModifyContent': '<boolean>', 'canModifyContentRestriction': '<boolean>', 'canModifyLabels': '<boolean>', 'canMoveChildrenOutOfDrive': '<boolean>', 'canMoveChildrenOutOfTeamDrive': '<boolean>', 'canMoveChildrenWithinDrive': '<boolean>', 'canMoveChildrenWithinTeamDrive': '<boolean>', 'canMoveItemIntoTeamDrive': '<boolean>', 'canMoveItemOutOfDrive': '<boolean>', 'canMoveItemOutOfTeamDrive': '<boolean>', 'canMoveItemWithinDrive': '<boolean>', 'canMoveItemWithinTeamDrive': '<boolean>', 'canMoveTeamDriveItem': '<boolean>', 'canReadDrive': '<boolean>', 'canReadLabels': '<boolean>', 'canReadRevisions': '<boolean>', 'canReadTeamDrive': '<boolean>', 'canRemoveChildren': '<boolean>', 'canRemoveMyDriveParent': '<boolean>', 'canRename': '<boolean>', 'canShare': '<boolean>', 'canTrash': '<boolean>', 'canTrashChildren': '<boolean>', 'canUntrash': '<boolean>'}.
+            contentHints (object): contentHints Example: {'indexableText': '<string>', 'thumbnail': {'image': '<string>', 'mimeType': '<string>'}}.
             contentRestrictions (array): contentRestrictions Example: "[{'readOnly': '<boolean>', 'reason': '<string>', 'restrictingUser': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'restrictionTime': '<dateTime>', 'type': '<string>'}, {'readOnly': '<boolean>', 'reason': '<string>', 'restrictingUser': {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, 'restrictionTime': '<dateTime>', 'type': '<string>'}]".
             copyRequiresWriterPermission (string): copyRequiresWriterPermission Example: '<boolean>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             description (string): description Example: '<string>'.
             driveId (string): driveId Example: '<string>'.
             explicitlyTrashed (string): explicitlyTrashed Example: '<boolean>'.
-            exportLinks (object): exportLinks
+            exportLinks (object): exportLinks Example: {'ea2eb': '<string>'}.
             fileExtension (string): fileExtension Example: '<string>'.
             folderColorRgb (string): folderColorRgb Example: '<string>'.
             fullFileExtension (string): fullFileExtension Example: '<string>'.
@@ -2617,12 +1767,12 @@ class GoogleDriveApp(APIApplication):
             headRevisionId (string): headRevisionId Example: '<string>'.
             iconLink (string): iconLink Example: '<string>'.
             id (string): id Example: '<string>'.
-            imageMediaMetadata (object): imageMediaMetadata
+            imageMediaMetadata (object): imageMediaMetadata Example: {'aperture': '<float>', 'cameraMake': '<string>', 'cameraModel': '<string>', 'colorSpace': '<string>', 'exposureBias': '<float>', 'exposureMode': '<string>', 'exposureTime': '<float>', 'flashUsed': '<boolean>', 'focalLength': '<float>', 'height': '<integer>', 'isoSpeed': '<integer>', 'lens': '<string>', 'location': {'altitude': '<double>', 'latitude': '<double>', 'longitude': '<double>'}, 'maxApertureValue': '<float>', 'meteringMode': '<string>', 'rotation': '<integer>', 'sensor': '<string>', 'subjectDistance': '<integer>', 'time': '<string>', 'whiteBalance': '<string>', 'width': '<integer>'}.
             isAppAuthorized (string): isAppAuthorized Example: '<boolean>'.
             kind (string): kind Example: 'drive#file'.
-            labelInfo (object): labelInfo
-            lastModifyingUser (object): lastModifyingUser
-            linkShareMetadata (object): linkShareMetadata
+            labelInfo (object): labelInfo Example: {'labels': [{'fields': {'eu_9c': {'dateString': ['<date>', '<date>'], 'id': '<string>', 'integer': ['<int64>', '<int64>'], 'kind': 'drive#labelField', 'selection': ['<string>', '<string>'], 'text': ['<string>', '<string>'], 'user': [{'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}], 'valueType': '<string>'}}, 'id': '<string>', 'kind': 'drive#label', 'revisionId': '<string>'}, {'fields': {'dolor65': {'dateString': ['<date>', '<date>'], 'id': '<string>', 'integer': ['<int64>', '<int64>'], 'kind': 'drive#labelField', 'selection': ['<string>', '<string>'], 'text': ['<string>', '<string>'], 'user': [{'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}, {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}], 'valueType': '<string>'}}, 'id': '<string>', 'kind': 'drive#label', 'revisionId': '<string>'}]}.
+            lastModifyingUser (object): lastModifyingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
+            linkShareMetadata (object): linkShareMetadata Example: {'securityUpdateEligible': '<boolean>', 'securityUpdateEnabled': '<boolean>'}.
             md5Checksum (string): md5Checksum Example: '<string>'.
             mimeType (string): mimeType Example: '<string>'.
             modifiedByMe (string): modifiedByMe Example: '<boolean>'.
@@ -2635,15 +1785,15 @@ class GoogleDriveApp(APIApplication):
             parents (array): parents Example: "['<string>', '<string>']".
             permissionIds (array): permissionIds Example: "['<string>', '<string>']".
             permissions (array): permissions Example: "[{'allowFileDiscovery': '<boolean>', 'deleted': '<boolean>', 'displayName': '<string>', 'domain': '<string>', 'emailAddress': '<string>', 'expirationTime': '<dateTime>', 'id': '<string>', 'kind': 'drive#permission', 'pendingOwner': '<boolean>', 'permissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}], 'photoLink': '<string>', 'role': '<string>', 'teamDrivePermissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}], 'type': '<string>', 'view': '<string>'}, {'allowFileDiscovery': '<boolean>', 'deleted': '<boolean>', 'displayName': '<string>', 'domain': '<string>', 'emailAddress': '<string>', 'expirationTime': '<dateTime>', 'id': '<string>', 'kind': 'drive#permission', 'pendingOwner': '<boolean>', 'permissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'permissionType': '<string>', 'role': '<string>'}], 'photoLink': '<string>', 'role': '<string>', 'teamDrivePermissionDetails': [{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}], 'type': '<string>', 'view': '<string>'}]".
-            properties (object): properties
+            properties (object): properties Example: {'eiusmod_21': '<string>', 'non3c': '<string>'}.
             quotaBytesUsed (string): quotaBytesUsed Example: '<int64>'.
             resourceKey (string): resourceKey Example: '<string>'.
             sha1Checksum (string): sha1Checksum Example: '<string>'.
             sha256Checksum (string): sha256Checksum Example: '<string>'.
             shared (string): shared Example: '<boolean>'.
             sharedWithMeTime (string): sharedWithMeTime Example: '<dateTime>'.
-            sharingUser (object): sharingUser
-            shortcutDetails (object): shortcutDetails
+            sharingUser (object): sharingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
+            shortcutDetails (object): shortcutDetails Example: {'targetId': '<string>', 'targetMimeType': '<string>', 'targetResourceKey': '<string>'}.
             size (string): size Example: '<int64>'.
             spaces (array): spaces Example: "['<string>', '<string>']".
             starred (string): starred Example: '<boolean>'.
@@ -2652,440 +1802,30 @@ class GoogleDriveApp(APIApplication):
             thumbnailVersion (string): thumbnailVersion Example: '<int64>'.
             trashed (string): trashed Example: '<boolean>'.
             trashedTime (string): trashedTime Example: '<dateTime>'.
-            trashingUser (object): trashingUser
+            trashingUser (object): trashingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
             version (string): version Example: '<int64>'.
-            videoMediaMetadata (object): videoMediaMetadata
+            videoMediaMetadata (object): videoMediaMetadata Example: {'durationMillis': '<int64>', 'height': '<integer>', 'width': '<integer>'}.
             viewedByMe (string): viewedByMe Example: '<boolean>'.
             viewedByMeTime (string): viewedByMeTime Example: '<dateTime>'.
             viewersCanCopyContent (string): viewersCanCopyContent Example: '<boolean>'.
             webContentLink (string): webContentLink Example: '<string>'.
             webViewLink (string): webViewLink Example: '<string>'.
-            writersCanShare (string): writersCanShare
-                Example:
-                ```json
-                {
-                  "appProperties": {
-                    "essef3a": "<string>",
-                    "magna9e": "<string>"
-                  },
-                  "capabilities": {
-                    "canAcceptOwnership": "<boolean>",
-                    "canAddChildren": "<boolean>",
-                    "canAddFolderFromAnotherDrive": "<boolean>",
-                    "canAddMyDriveParent": "<boolean>",
-                    "canChangeCopyRequiresWriterPermission": "<boolean>",
-                    "canChangeSecurityUpdateEnabled": "<boolean>",
-                    "canChangeViewersCanCopyContent": "<boolean>",
-                    "canComment": "<boolean>",
-                    "canCopy": "<boolean>",
-                    "canDelete": "<boolean>",
-                    "canDeleteChildren": "<boolean>",
-                    "canDownload": "<boolean>",
-                    "canEdit": "<boolean>",
-                    "canListChildren": "<boolean>",
-                    "canModifyContent": "<boolean>",
-                    "canModifyContentRestriction": "<boolean>",
-                    "canModifyLabels": "<boolean>",
-                    "canMoveChildrenOutOfDrive": "<boolean>",
-                    "canMoveChildrenOutOfTeamDrive": "<boolean>",
-                    "canMoveChildrenWithinDrive": "<boolean>",
-                    "canMoveChildrenWithinTeamDrive": "<boolean>",
-                    "canMoveItemIntoTeamDrive": "<boolean>",
-                    "canMoveItemOutOfDrive": "<boolean>",
-                    "canMoveItemOutOfTeamDrive": "<boolean>",
-                    "canMoveItemWithinDrive": "<boolean>",
-                    "canMoveItemWithinTeamDrive": "<boolean>",
-                    "canMoveTeamDriveItem": "<boolean>",
-                    "canReadDrive": "<boolean>",
-                    "canReadLabels": "<boolean>",
-                    "canReadRevisions": "<boolean>",
-                    "canReadTeamDrive": "<boolean>",
-                    "canRemoveChildren": "<boolean>",
-                    "canRemoveMyDriveParent": "<boolean>",
-                    "canRename": "<boolean>",
-                    "canShare": "<boolean>",
-                    "canTrash": "<boolean>",
-                    "canTrashChildren": "<boolean>",
-                    "canUntrash": "<boolean>"
-                  },
-                  "contentHints": {
-                    "indexableText": "<string>",
-                    "thumbnail": {
-                      "image": "<string>",
-                      "mimeType": "<string>"
-                    }
-                  },
-                  "contentRestrictions": [
-                    {
-                      "readOnly": "<boolean>",
-                      "reason": "<string>",
-                      "restrictingUser": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "restrictionTime": "<dateTime>",
-                      "type": "<string>"
-                    },
-                    {
-                      "readOnly": "<boolean>",
-                      "reason": "<string>",
-                      "restrictingUser": {
-                        "displayName": "<string>",
-                        "emailAddress": "<string>",
-                        "kind": "drive#user",
-                        "me": "<boolean>",
-                        "permissionId": "<string>",
-                        "photoLink": "<string>"
-                      },
-                      "restrictionTime": "<dateTime>",
-                      "type": "<string>"
-                    }
-                  ],
-                  "copyRequiresWriterPermission": "<boolean>",
-                  "createdTime": "<dateTime>",
-                  "description": "<string>",
-                  "driveId": "<string>",
-                  "explicitlyTrashed": "<boolean>",
-                  "exportLinks": {
-                    "ea2eb": "<string>"
-                  },
-                  "fileExtension": "<string>",
-                  "folderColorRgb": "<string>",
-                  "fullFileExtension": "<string>",
-                  "hasAugmentedPermissions": "<boolean>",
-                  "hasThumbnail": "<boolean>",
-                  "headRevisionId": "<string>",
-                  "iconLink": "<string>",
-                  "id": "<string>",
-                  "imageMediaMetadata": {
-                    "aperture": "<float>",
-                    "cameraMake": "<string>",
-                    "cameraModel": "<string>",
-                    "colorSpace": "<string>",
-                    "exposureBias": "<float>",
-                    "exposureMode": "<string>",
-                    "exposureTime": "<float>",
-                    "flashUsed": "<boolean>",
-                    "focalLength": "<float>",
-                    "height": "<integer>",
-                    "isoSpeed": "<integer>",
-                    "lens": "<string>",
-                    "location": {
-                      "altitude": "<double>",
-                      "latitude": "<double>",
-                      "longitude": "<double>"
-                    },
-                    "maxApertureValue": "<float>",
-                    "meteringMode": "<string>",
-                    "rotation": "<integer>",
-                    "sensor": "<string>",
-                    "subjectDistance": "<integer>",
-                    "time": "<string>",
-                    "whiteBalance": "<string>",
-                    "width": "<integer>"
-                  },
-                  "isAppAuthorized": "<boolean>",
-                  "kind": "drive#file",
-                  "labelInfo": {
-                    "labels": [
-                      {
-                        "fields": {
-                          "eu_9c": {
-                            "dateString": [
-                              "<date>",
-                              "<date>"
-                            ],
-                            "id": "<string>",
-                            "integer": [
-                              "<int64>",
-                              "<int64>"
-                            ],
-                            "kind": "drive#labelField",
-                            "selection": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "text": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "user": [
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              },
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              }
-                            ],
-                            "valueType": "<string>"
-                          }
-                        },
-                        "id": "<string>",
-                        "kind": "drive#label",
-                        "revisionId": "<string>"
-                      },
-                      {
-                        "fields": {
-                          "dolor65": {
-                            "dateString": [
-                              "<date>",
-                              "<date>"
-                            ],
-                            "id": "<string>",
-                            "integer": [
-                              "<int64>",
-                              "<int64>"
-                            ],
-                            "kind": "drive#labelField",
-                            "selection": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "text": [
-                              "<string>",
-                              "<string>"
-                            ],
-                            "user": [
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              },
-                              {
-                                "displayName": "<string>",
-                                "emailAddress": "<string>",
-                                "kind": "drive#user",
-                                "me": "<boolean>",
-                                "permissionId": "<string>",
-                                "photoLink": "<string>"
-                              }
-                            ],
-                            "valueType": "<string>"
-                          }
-                        },
-                        "id": "<string>",
-                        "kind": "drive#label",
-                        "revisionId": "<string>"
-                      }
-                    ]
-                  },
-                  "lastModifyingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "linkShareMetadata": {
-                    "securityUpdateEligible": "<boolean>",
-                    "securityUpdateEnabled": "<boolean>"
-                  },
-                  "md5Checksum": "<string>",
-                  "mimeType": "<string>",
-                  "modifiedByMe": "<boolean>",
-                  "modifiedByMeTime": "<dateTime>",
-                  "modifiedTime": "<dateTime>",
-                  "name": "<string>",
-                  "originalFilename": "<string>",
-                  "ownedByMe": "<boolean>",
-                  "owners": [
-                    {
-                      "displayName": "<string>",
-                      "emailAddress": "<string>",
-                      "kind": "drive#user",
-                      "me": "<boolean>",
-                      "permissionId": "<string>",
-                      "photoLink": "<string>"
-                    },
-                    {
-                      "displayName": "<string>",
-                      "emailAddress": "<string>",
-                      "kind": "drive#user",
-                      "me": "<boolean>",
-                      "permissionId": "<string>",
-                      "photoLink": "<string>"
-                    }
-                  ],
-                  "parents": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "permissionIds": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "permissions": [
-                    {
-                      "allowFileDiscovery": "<boolean>",
-                      "deleted": "<boolean>",
-                      "displayName": "<string>",
-                      "domain": "<string>",
-                      "emailAddress": "<string>",
-                      "expirationTime": "<dateTime>",
-                      "id": "<string>",
-                      "kind": "drive#permission",
-                      "pendingOwner": "<boolean>",
-                      "permissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        }
-                      ],
-                      "photoLink": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        }
-                      ],
-                      "type": "<string>",
-                      "view": "<string>"
-                    },
-                    {
-                      "allowFileDiscovery": "<boolean>",
-                      "deleted": "<boolean>",
-                      "displayName": "<string>",
-                      "domain": "<string>",
-                      "emailAddress": "<string>",
-                      "expirationTime": "<dateTime>",
-                      "id": "<string>",
-                      "kind": "drive#permission",
-                      "pendingOwner": "<boolean>",
-                      "permissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "permissionType": "<string>",
-                          "role": "<string>"
-                        }
-                      ],
-                      "photoLink": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionDetails": [
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        },
-                        {
-                          "inherited": "<boolean>",
-                          "inheritedFrom": "<string>",
-                          "role": "<string>",
-                          "teamDrivePermissionType": "<string>"
-                        }
-                      ],
-                      "type": "<string>",
-                      "view": "<string>"
-                    }
-                  ],
-                  "properties": {
-                    "eiusmod_21": "<string>",
-                    "non3c": "<string>"
-                  },
-                  "quotaBytesUsed": "<int64>",
-                  "resourceKey": "<string>",
-                  "sha1Checksum": "<string>",
-                  "sha256Checksum": "<string>",
-                  "shared": "<boolean>",
-                  "sharedWithMeTime": "<dateTime>",
-                  "sharingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "shortcutDetails": {
-                    "targetId": "<string>",
-                    "targetMimeType": "<string>",
-                    "targetResourceKey": "<string>"
-                  },
-                  "size": "<int64>",
-                  "spaces": [
-                    "<string>",
-                    "<string>"
-                  ],
-                  "starred": "<boolean>",
-                  "teamDriveId": "<string>",
-                  "thumbnailLink": "<string>",
-                  "thumbnailVersion": "<int64>",
-                  "trashed": "<boolean>",
-                  "trashedTime": "<dateTime>",
-                  "trashingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "version": "<int64>",
-                  "videoMediaMetadata": {
-                    "durationMillis": "<int64>",
-                    "height": "<integer>",
-                    "width": "<integer>"
-                  },
-                  "viewedByMe": "<boolean>",
-                  "viewedByMeTime": "<dateTime>",
-                  "viewersCanCopyContent": "<boolean>",
-                  "webContentLink": "<string>",
-                  "webViewLink": "<string>",
-                  "writersCanShare": "<boolean>"
-                }
-                ```
+            writersCanShare (string): writersCanShare Example: '<boolean>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Files
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'fileId'.")
+        request_body_data = None
+        request_body_data = {
             'appProperties': appProperties,
             'capabilities': capabilities,
             'contentHints': contentHints,
@@ -3149,14 +1889,19 @@ class GoogleDriveApp(APIApplication):
             'webViewLink': webViewLink,
             'writersCanShare': writersCanShare,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/copy"
         query_params = {k: v for k, v in [('enforceSingleParent', enforceSingleParent), ('ignoreDefaultVisibility', ignoreDefaultVisibility), ('includeLabels', includeLabels), ('includePermissionsForView', includePermissionsForView), ('keepRevisionForever', keepRevisionForever), ('ocrLanguage', ocrLanguage), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def export_agoogle_workspace_document(self, fileId, mimeType=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> Any:
+    def export_agoogle_workspace_document(self, fileId: str, mimeType: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> Any:
         """
         Export a Google Workspace document
 
@@ -3174,18 +1919,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Files
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         url = f"{self.base_url}/files/{fileId}/export"
         query_params = {k: v for k, v in [('mimeType', mimeType), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def list_the_labels_on_afile(self, fileId, maxResults=None, pageToken=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def list_the_labels_on_afile(self, fileId: str, maxResults: Optional[str] = None, pageToken: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         List the labels on a file
 
@@ -3204,18 +1958,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Files
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         url = f"{self.base_url}/files/{fileId}/listLabels"
         query_params = {k: v for k, v in [('maxResults', maxResults), ('pageToken', pageToken), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def modify_labels_applied_to_afile(self, fileId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, kind=None, labelModifications=None) -> dict[str, Any]:
+    def modify_labels_applied_to_afile(self, fileId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, kind: Optional[str] = None, labelModifications: Optional[List[dict[str, Any]]] = None) -> dict[str, Any]:
         """
         Modify labels applied to a file
 
@@ -3229,150 +1992,38 @@ class GoogleDriveApp(APIApplication):
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
             kind (string): kind Example: 'drive#modifyLabelsRequest'.
-            labelModifications (array): labelModifications
-                Example:
-                ```json
-                {
-                  "kind": "drive#modifyLabelsRequest",
-                  "labelModifications": [
-                    {
-                      "fieldModifications": [
-                        {
-                          "fieldId": "<string>",
-                          "kind": "drive#labelFieldModification",
-                          "setDateValues": [
-                            "<date>",
-                            "<date>"
-                          ],
-                          "setIntegerValues": [
-                            "<int64>",
-                            "<int64>"
-                          ],
-                          "setSelectionValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "setTextValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "setUserValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "unsetValues": "<boolean>"
-                        },
-                        {
-                          "fieldId": "<string>",
-                          "kind": "drive#labelFieldModification",
-                          "setDateValues": [
-                            "<date>",
-                            "<date>"
-                          ],
-                          "setIntegerValues": [
-                            "<int64>",
-                            "<int64>"
-                          ],
-                          "setSelectionValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "setTextValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "setUserValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "unsetValues": "<boolean>"
-                        }
-                      ],
-                      "kind": "drive#labelModification",
-                      "labelId": "<string>",
-                      "removeLabel": "<boolean>"
-                    },
-                    {
-                      "fieldModifications": [
-                        {
-                          "fieldId": "<string>",
-                          "kind": "drive#labelFieldModification",
-                          "setDateValues": [
-                            "<date>",
-                            "<date>"
-                          ],
-                          "setIntegerValues": [
-                            "<int64>",
-                            "<int64>"
-                          ],
-                          "setSelectionValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "setTextValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "setUserValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "unsetValues": "<boolean>"
-                        },
-                        {
-                          "fieldId": "<string>",
-                          "kind": "drive#labelFieldModification",
-                          "setDateValues": [
-                            "<date>",
-                            "<date>"
-                          ],
-                          "setIntegerValues": [
-                            "<int64>",
-                            "<int64>"
-                          ],
-                          "setSelectionValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "setTextValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "setUserValues": [
-                            "<string>",
-                            "<string>"
-                          ],
-                          "unsetValues": "<boolean>"
-                        }
-                      ],
-                      "kind": "drive#labelModification",
-                      "labelId": "<string>",
-                      "removeLabel": "<boolean>"
-                    }
-                  ]
-                }
-                ```
+            labelModifications (array): labelModifications Example: "[{'fieldModifications': [{'fieldId': '<string>', 'kind': 'drive#labelFieldModification', 'setDateValues': ['<date>', '<date>'], 'setIntegerValues': ['<int64>', '<int64>'], 'setSelectionValues': ['<string>', '<string>'], 'setTextValues': ['<string>', '<string>'], 'setUserValues': ['<string>', '<string>'], 'unsetValues': '<boolean>'}, {'fieldId': '<string>', 'kind': 'drive#labelFieldModification', 'setDateValues': ['<date>', '<date>'], 'setIntegerValues': ['<int64>', '<int64>'], 'setSelectionValues': ['<string>', '<string>'], 'setTextValues': ['<string>', '<string>'], 'setUserValues': ['<string>', '<string>'], 'unsetValues': '<boolean>'}], 'kind': 'drive#labelModification', 'labelId': '<string>', 'removeLabel': '<boolean>'}, {'fieldModifications': [{'fieldId': '<string>', 'kind': 'drive#labelFieldModification', 'setDateValues': ['<date>', '<date>'], 'setIntegerValues': ['<int64>', '<int64>'], 'setSelectionValues': ['<string>', '<string>'], 'setTextValues': ['<string>', '<string>'], 'setUserValues': ['<string>', '<string>'], 'unsetValues': '<boolean>'}, {'fieldId': '<string>', 'kind': 'drive#labelFieldModification', 'setDateValues': ['<date>', '<date>'], 'setIntegerValues': ['<int64>', '<int64>'], 'setSelectionValues': ['<string>', '<string>'], 'setTextValues': ['<string>', '<string>'], 'setUserValues': ['<string>', '<string>'], 'unsetValues': '<boolean>'}], 'kind': 'drive#labelModification', 'labelId': '<string>', 'removeLabel': '<boolean>'}]".
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Files
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'fileId'.")
+        request_body_data = None
+        request_body_data = {
             'kind': kind,
             'labelModifications': labelModifications,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/modifyLabels"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def subscribe_to_changes_to_afile(self, fileId, acknowledgeAbuse=None, includeLabels=None, includePermissionsForView=None, supportsAllDrives=None, supportsTeamDrives=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, address=None, expiration=None, id=None, kind=None, params=None, payload=None, resourceId=None, resourceUri=None, token=None, type=None) -> dict[str, Any]:
+    def subscribe_to_changes_to_afile(self, fileId: str, acknowledgeAbuse: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, address: Optional[str] = None, expiration: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, params: Optional[dict[str, Any]] = None, payload: Optional[str] = None, resourceId: Optional[str] = None, resourceUri: Optional[str] = None, token: Optional[str] = None, type: Optional[str] = None) -> dict[str, Any]:
         """
         Subscribe to changes to a file
 
@@ -3394,41 +2045,27 @@ class GoogleDriveApp(APIApplication):
             expiration (string): expiration Example: '<int64>'.
             id (string): id Example: '<string>'.
             kind (string): kind Example: 'api#channel'.
-            params (object): params
+            params (object): params Example: {'adipisicing1': '<string>', 'eu2': '<string>', 'qui_9': '<string>'}.
             payload (string): payload Example: '<boolean>'.
             resourceId (string): resourceId Example: '<string>'.
             resourceUri (string): resourceUri Example: '<string>'.
             token (string): token Example: '<string>'.
-            type (string): type
-                Example:
-                ```json
-                {
-                  "address": "<string>",
-                  "expiration": "<int64>",
-                  "id": "<string>",
-                  "kind": "api#channel",
-                  "params": {
-                    "adipisicing1": "<string>",
-                    "eu2": "<string>",
-                    "qui_9": "<string>"
-                  },
-                  "payload": "<boolean>",
-                  "resourceId": "<string>",
-                  "resourceUri": "<string>",
-                  "token": "<string>",
-                  "type": "<string>"
-                }
-                ```
+            type (string): type Example: '<string>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Files
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'fileId'.")
+        request_body_data = None
+        request_body_data = {
             'address': address,
             'expiration': expiration,
             'id': id,
@@ -3440,14 +2077,19 @@ class GoogleDriveApp(APIApplication):
             'token': token,
             'type': type,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/watch"
         query_params = {k: v for k, v in [('acknowledgeAbuse', acknowledgeAbuse), ('includeLabels', includeLabels), ('includePermissionsForView', includePermissionsForView), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def list_afile_sor_shared_drive_spermissions(self, fileId, includePermissionsForView=None, pageSize=None, pageToken=None, supportsAllDrives=None, supportsTeamDrives=None, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def list_file_permissions(self, fileId: str, includePermissionsForView: Optional[str] = None, pageSize: Optional[str] = None, pageToken: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         List a file's or shared drive's permissions
 
@@ -3470,18 +2112,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Permissions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         url = f"{self.base_url}/files/{fileId}/permissions"
         query_params = {k: v for k, v in [('includePermissionsForView', includePermissionsForView), ('pageSize', pageSize), ('pageToken', pageToken), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def create_apermission_for_afile_or_shared_drive(self, fileId, emailMessage=None, enforceSingleParent=None, moveToNewOwnersRoot=None, sendNotificationEmail=None, supportsAllDrives=None, supportsTeamDrives=None, transferOwnership=None, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, allowFileDiscovery=None, deleted=None, displayName=None, domain=None, emailAddress=None, expirationTime=None, id=None, kind=None, pendingOwner=None, permissionDetails=None, photoLink=None, role=None, teamDrivePermissionDetails=None, type=None, view=None) -> dict[str, Any]:
+    def post_file_permission(self, fileId: str, emailMessage: Optional[str] = None, enforceSingleParent: Optional[str] = None, moveToNewOwnersRoot: Optional[str] = None, sendNotificationEmail: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, transferOwnership: Optional[str] = None, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, allowFileDiscovery: Optional[str] = None, deleted: Optional[str] = None, displayName: Optional[str] = None, domain: Optional[str] = None, emailAddress: Optional[str] = None, expirationTime: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, pendingOwner: Optional[str] = None, permissionDetails: Optional[List[dict[str, Any]]] = None, photoLink: Optional[str] = None, role: Optional[str] = None, teamDrivePermissionDetails: Optional[List[dict[str, Any]]] = None, type: Optional[str] = None, view: Optional[str] = None) -> dict[str, Any]:
         """
         Create a permission for a file or shared drive
 
@@ -3516,63 +2167,22 @@ class GoogleDriveApp(APIApplication):
             role (string): role Example: '<string>'.
             teamDrivePermissionDetails (array): teamDrivePermissionDetails Example: "[{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}]".
             type (string): type Example: '<string>'.
-            view (string): view
-                Example:
-                ```json
-                {
-                  "allowFileDiscovery": "<boolean>",
-                  "deleted": "<boolean>",
-                  "displayName": "<string>",
-                  "domain": "<string>",
-                  "emailAddress": "<string>",
-                  "expirationTime": "<dateTime>",
-                  "id": "<string>",
-                  "kind": "drive#permission",
-                  "pendingOwner": "<boolean>",
-                  "permissionDetails": [
-                    {
-                      "inherited": "<boolean>",
-                      "inheritedFrom": "<string>",
-                      "permissionType": "<string>",
-                      "role": "<string>"
-                    },
-                    {
-                      "inherited": "<boolean>",
-                      "inheritedFrom": "<string>",
-                      "permissionType": "<string>",
-                      "role": "<string>"
-                    }
-                  ],
-                  "photoLink": "<string>",
-                  "role": "<string>",
-                  "teamDrivePermissionDetails": [
-                    {
-                      "inherited": "<boolean>",
-                      "inheritedFrom": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionType": "<string>"
-                    },
-                    {
-                      "inherited": "<boolean>",
-                      "inheritedFrom": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionType": "<string>"
-                    }
-                  ],
-                  "type": "<string>",
-                  "view": "<string>"
-                }
-                ```
+            view (string): view Example: '<string>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Permissions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'fileId'.")
+        request_body_data = None
+        request_body_data = {
             'allowFileDiscovery': allowFileDiscovery,
             'deleted': deleted,
             'displayName': displayName,
@@ -3589,14 +2199,19 @@ class GoogleDriveApp(APIApplication):
             'type': type,
             'view': view,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/permissions"
         query_params = {k: v for k, v in [('emailMessage', emailMessage), ('enforceSingleParent', enforceSingleParent), ('moveToNewOwnersRoot', moveToNewOwnersRoot), ('sendNotificationEmail', sendNotificationEmail), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('transferOwnership', transferOwnership), ('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def get_permission_by_id(self, fileId, permissionId, supportsAllDrives=None, supportsTeamDrives=None, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def get_permission_by_id(self, fileId: str, permissionId: str, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Get permission by ID
 
@@ -3617,20 +2232,29 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Permissions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if permissionId is None:
-            raise ValueError("Missing required parameter 'permissionId'")
+            raise ValueError("Missing required parameter 'permissionId'.")
         url = f"{self.base_url}/files/{fileId}/permissions/{permissionId}"
         query_params = {k: v for k, v in [('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def delete_apermission(self, fileId, permissionId, supportsAllDrives=None, supportsTeamDrives=None, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> Any:
+    def delete_apermission(self, fileId: str, permissionId: str, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> Any:
         """
         Delete a permission
 
@@ -3651,20 +2275,29 @@ class GoogleDriveApp(APIApplication):
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Permissions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if permissionId is None:
-            raise ValueError("Missing required parameter 'permissionId'")
+            raise ValueError("Missing required parameter 'permissionId'.")
         url = f"{self.base_url}/files/{fileId}/permissions/{permissionId}"
         query_params = {k: v for k, v in [('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._delete(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def update_apermission(self, fileId, permissionId, removeExpiration=None, supportsAllDrives=None, supportsTeamDrives=None, transferOwnership=None, useDomainAdminAccess=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, allowFileDiscovery=None, deleted=None, displayName=None, domain=None, emailAddress=None, expirationTime=None, id=None, kind=None, pendingOwner=None, permissionDetails=None, photoLink=None, role=None, teamDrivePermissionDetails=None, type=None, view=None) -> dict[str, Any]:
+    def update_apermission(self, fileId: str, permissionId: str, removeExpiration: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, transferOwnership: Optional[str] = None, useDomainAdminAccess: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, allowFileDiscovery: Optional[str] = None, deleted: Optional[str] = None, displayName: Optional[str] = None, domain: Optional[str] = None, emailAddress: Optional[str] = None, expirationTime: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, pendingOwner: Optional[str] = None, permissionDetails: Optional[List[dict[str, Any]]] = None, photoLink: Optional[str] = None, role: Optional[str] = None, teamDrivePermissionDetails: Optional[List[dict[str, Any]]] = None, type: Optional[str] = None, view: Optional[str] = None) -> dict[str, Any]:
         """
         Update a permission
 
@@ -3697,65 +2330,24 @@ class GoogleDriveApp(APIApplication):
             role (string): role Example: '<string>'.
             teamDrivePermissionDetails (array): teamDrivePermissionDetails Example: "[{'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}, {'inherited': '<boolean>', 'inheritedFrom': '<string>', 'role': '<string>', 'teamDrivePermissionType': '<string>'}]".
             type (string): type Example: '<string>'.
-            view (string): view
-                Example:
-                ```json
-                {
-                  "allowFileDiscovery": "<boolean>",
-                  "deleted": "<boolean>",
-                  "displayName": "<string>",
-                  "domain": "<string>",
-                  "emailAddress": "<string>",
-                  "expirationTime": "<dateTime>",
-                  "id": "<string>",
-                  "kind": "drive#permission",
-                  "pendingOwner": "<boolean>",
-                  "permissionDetails": [
-                    {
-                      "inherited": "<boolean>",
-                      "inheritedFrom": "<string>",
-                      "permissionType": "<string>",
-                      "role": "<string>"
-                    },
-                    {
-                      "inherited": "<boolean>",
-                      "inheritedFrom": "<string>",
-                      "permissionType": "<string>",
-                      "role": "<string>"
-                    }
-                  ],
-                  "photoLink": "<string>",
-                  "role": "<string>",
-                  "teamDrivePermissionDetails": [
-                    {
-                      "inherited": "<boolean>",
-                      "inheritedFrom": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionType": "<string>"
-                    },
-                    {
-                      "inherited": "<boolean>",
-                      "inheritedFrom": "<string>",
-                      "role": "<string>",
-                      "teamDrivePermissionType": "<string>"
-                    }
-                  ],
-                  "type": "<string>",
-                  "view": "<string>"
-                }
-                ```
+            view (string): view Example: '<string>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Permissions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if permissionId is None:
-            raise ValueError("Missing required parameter 'permissionId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'permissionId'.")
+        request_body_data = None
+        request_body_data = {
             'allowFileDiscovery': allowFileDiscovery,
             'deleted': deleted,
             'displayName': displayName,
@@ -3772,14 +2364,19 @@ class GoogleDriveApp(APIApplication):
             'type': type,
             'view': view,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/permissions/{permissionId}"
         query_params = {k: v for k, v in [('removeExpiration', removeExpiration), ('supportsAllDrives', supportsAllDrives), ('supportsTeamDrives', supportsTeamDrives), ('transferOwnership', transferOwnership), ('useDomainAdminAccess', useDomainAdminAccess), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._patch(url, data=request_body, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def list_acomment_sreplies(self, fileId, commentId, includeDeleted=None, pageSize=None, pageToken=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def list_acomment_sreplies(self, fileId: str, commentId: str, includeDeleted: Optional[str] = None, pageSize: Optional[str] = None, pageToken: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         List a comment's replies
 
@@ -3800,20 +2397,29 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Replies
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if commentId is None:
-            raise ValueError("Missing required parameter 'commentId'")
+            raise ValueError("Missing required parameter 'commentId'.")
         url = f"{self.base_url}/files/{fileId}/comments/{commentId}/replies"
         query_params = {k: v for k, v in [('includeDeleted', includeDeleted), ('pageSize', pageSize), ('pageToken', pageToken), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def create_areply_to_acomment(self, fileId, commentId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, action=None, author=None, content=None, createdTime=None, deleted=None, htmlContent=None, id=None, kind=None, modifiedTime=None) -> dict[str, Any]:
+    def create_areply_to_acomment(self, fileId: str, commentId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, action: Optional[str] = None, author: Optional[dict[str, Any]] = None, content: Optional[str] = None, createdTime: Optional[str] = None, deleted: Optional[str] = None, htmlContent: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, modifiedTime: Optional[str] = None) -> dict[str, Any]:
         """
         Create a reply to a comment
 
@@ -3828,47 +2434,31 @@ class GoogleDriveApp(APIApplication):
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
             action (string): action Example: '<string>'.
-            author (object): author
+            author (object): author Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
             content (string): content Example: '<string>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             deleted (string): deleted Example: '<boolean>'.
             htmlContent (string): htmlContent Example: '<string>'.
             id (string): id Example: '<string>'.
             kind (string): kind Example: 'drive#reply'.
-            modifiedTime (string): modifiedTime
-                Example:
-                ```json
-                {
-                  "action": "<string>",
-                  "author": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "content": "<string>",
-                  "createdTime": "<dateTime>",
-                  "deleted": "<boolean>",
-                  "htmlContent": "<string>",
-                  "id": "<string>",
-                  "kind": "drive#reply",
-                  "modifiedTime": "<dateTime>"
-                }
-                ```
+            modifiedTime (string): modifiedTime Example: '<dateTime>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Replies
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if commentId is None:
-            raise ValueError("Missing required parameter 'commentId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'commentId'.")
+        request_body_data = None
+        request_body_data = {
             'action': action,
             'author': author,
             'content': content,
@@ -3879,14 +2469,19 @@ class GoogleDriveApp(APIApplication):
             'kind': kind,
             'modifiedTime': modifiedTime,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/comments/{commentId}/replies"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def get_reply_by_id(self, fileId, commentId, replyId, includeDeleted=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def get_reply_by_id(self, fileId: str, commentId: str, replyId: str, includeDeleted: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Get reply by ID
 
@@ -3906,22 +2501,31 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Replies
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if commentId is None:
-            raise ValueError("Missing required parameter 'commentId'")
+            raise ValueError("Missing required parameter 'commentId'.")
         if replyId is None:
-            raise ValueError("Missing required parameter 'replyId'")
+            raise ValueError("Missing required parameter 'replyId'.")
         url = f"{self.base_url}/files/{fileId}/comments/{commentId}/replies/{replyId}"
         query_params = {k: v for k, v in [('includeDeleted', includeDeleted), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def delete_areply(self, fileId, commentId, replyId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> Any:
+    def delete_areply(self, fileId: str, commentId: str, replyId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> Any:
         """
         Delete a reply
 
@@ -3940,22 +2544,31 @@ class GoogleDriveApp(APIApplication):
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Replies
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if commentId is None:
-            raise ValueError("Missing required parameter 'commentId'")
+            raise ValueError("Missing required parameter 'commentId'.")
         if replyId is None:
-            raise ValueError("Missing required parameter 'replyId'")
+            raise ValueError("Missing required parameter 'replyId'.")
         url = f"{self.base_url}/files/{fileId}/comments/{commentId}/replies/{replyId}"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._delete(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def update_areply(self, fileId, commentId, replyId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, action=None, author=None, content=None, createdTime=None, deleted=None, htmlContent=None, id=None, kind=None, modifiedTime=None) -> dict[str, Any]:
+    def update_areply(self, fileId: str, commentId: str, replyId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, action: Optional[str] = None, author: Optional[dict[str, Any]] = None, content: Optional[str] = None, createdTime: Optional[str] = None, deleted: Optional[str] = None, htmlContent: Optional[str] = None, id: Optional[str] = None, kind: Optional[str] = None, modifiedTime: Optional[str] = None) -> dict[str, Any]:
         """
         Update a reply
 
@@ -3971,49 +2584,33 @@ class GoogleDriveApp(APIApplication):
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
             action (string): action Example: '<string>'.
-            author (object): author
+            author (object): author Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
             content (string): content Example: '<string>'.
             createdTime (string): createdTime Example: '<dateTime>'.
             deleted (string): deleted Example: '<boolean>'.
             htmlContent (string): htmlContent Example: '<string>'.
             id (string): id Example: '<string>'.
             kind (string): kind Example: 'drive#reply'.
-            modifiedTime (string): modifiedTime
-                Example:
-                ```json
-                {
-                  "action": "<string>",
-                  "author": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "content": "<string>",
-                  "createdTime": "<dateTime>",
-                  "deleted": "<boolean>",
-                  "htmlContent": "<string>",
-                  "id": "<string>",
-                  "kind": "drive#reply",
-                  "modifiedTime": "<dateTime>"
-                }
-                ```
+            modifiedTime (string): modifiedTime Example: '<dateTime>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Replies
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if commentId is None:
-            raise ValueError("Missing required parameter 'commentId'")
+            raise ValueError("Missing required parameter 'commentId'.")
         if replyId is None:
-            raise ValueError("Missing required parameter 'replyId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'replyId'.")
+        request_body_data = None
+        request_body_data = {
             'action': action,
             'author': author,
             'content': content,
@@ -4024,14 +2621,19 @@ class GoogleDriveApp(APIApplication):
             'kind': kind,
             'modifiedTime': modifiedTime,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/comments/{commentId}/replies/{replyId}"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._patch(url, data=request_body, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def list_afile_srevisions(self, fileId, pageSize=None, pageToken=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def list_afile_srevisions(self, fileId: str, pageSize: Optional[str] = None, pageToken: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         List a file's revisions
 
@@ -4050,18 +2652,27 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Revisions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         url = f"{self.base_url}/files/{fileId}/revisions"
         query_params = {k: v for k, v in [('pageSize', pageSize), ('pageToken', pageToken), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def get_aspecific_revision(self, fileId, revisionId, acknowledgeAbuse=None, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> dict[str, Any]:
+    def get_aspecific_revision(self, fileId: str, revisionId: str, acknowledgeAbuse: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
         Get a specific revision
 
@@ -4080,20 +2691,29 @@ class GoogleDriveApp(APIApplication):
         Returns:
             dict[str, Any]: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Revisions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if revisionId is None:
-            raise ValueError("Missing required parameter 'revisionId'")
+            raise ValueError("Missing required parameter 'revisionId'.")
         url = f"{self.base_url}/files/{fileId}/revisions/{revisionId}"
         query_params = {k: v for k, v in [('acknowledgeAbuse', acknowledgeAbuse), ('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def permanently_delete_afile_version(self, fileId, revisionId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None) -> Any:
+    def permanently_delete_afile_version(self, fileId: str, revisionId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> Any:
         """
         Permanently delete a file version
 
@@ -4111,20 +2731,29 @@ class GoogleDriveApp(APIApplication):
         Returns:
             Any: Successful response
 
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
+
         Tags:
             Revisions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if revisionId is None:
-            raise ValueError("Missing required parameter 'revisionId'")
+            raise ValueError("Missing required parameter 'revisionId'.")
         url = f"{self.base_url}/files/{fileId}/revisions/{revisionId}"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
         response = self._delete(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def update_arevision(self, fileId, revisionId, alt=None, fields=None, key=None, oauth_token=None, prettyPrint=None, quotaUser=None, userIp=None, exportLinks=None, id=None, keepForever=None, kind=None, lastModifyingUser=None, md5Checksum=None, mimeType=None, modifiedTime=None, originalFilename=None, publishAuto=None, published=None, publishedLink=None, publishedOutsideDomain=None, size=None) -> dict[str, Any]:
+    def update_arevision(self, fileId: str, revisionId: str, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None, exportLinks: Optional[dict[str, Any]] = None, id: Optional[str] = None, keepForever: Optional[str] = None, kind: Optional[str] = None, lastModifyingUser: Optional[dict[str, Any]] = None, md5Checksum: Optional[str] = None, mimeType: Optional[str] = None, modifiedTime: Optional[str] = None, originalFilename: Optional[str] = None, publishAuto: Optional[str] = None, published: Optional[str] = None, publishedLink: Optional[str] = None, publishedOutsideDomain: Optional[str] = None, size: Optional[str] = None) -> dict[str, Any]:
         """
         Update a revision
 
@@ -4138,11 +2767,11 @@ class GoogleDriveApp(APIApplication):
             prettyPrint (string): Returns response with indentations and line breaks. Example: '<boolean>'.
             quotaUser (string): An opaque string that represents a user for quota purposes. Must not exceed 40 characters. Example: '<string>'.
             userIp (string): Deprecated. Please use quotaUser instead. Example: '<string>'.
-            exportLinks (object): exportLinks
+            exportLinks (object): exportLinks Example: {'in3': '<string>', 'quis_d': '<string>'}.
             id (string): id Example: '<string>'.
             keepForever (string): keepForever Example: '<boolean>'.
             kind (string): kind Example: 'drive#revision'.
-            lastModifyingUser (object): lastModifyingUser
+            lastModifyingUser (object): lastModifyingUser Example: {'displayName': '<string>', 'emailAddress': '<string>', 'kind': 'drive#user', 'me': '<boolean>', 'permissionId': '<string>', 'photoLink': '<string>'}.
             md5Checksum (string): md5Checksum Example: '<string>'.
             mimeType (string): mimeType Example: '<string>'.
             modifiedTime (string): modifiedTime Example: '<dateTime>'.
@@ -4151,48 +2780,24 @@ class GoogleDriveApp(APIApplication):
             published (string): published Example: '<boolean>'.
             publishedLink (string): publishedLink Example: '<string>'.
             publishedOutsideDomain (string): publishedOutsideDomain Example: '<boolean>'.
-            size (string): size
-                Example:
-                ```json
-                {
-                  "exportLinks": {
-                    "in3": "<string>",
-                    "quis_d": "<string>"
-                  },
-                  "id": "<string>",
-                  "keepForever": "<boolean>",
-                  "kind": "drive#revision",
-                  "lastModifyingUser": {
-                    "displayName": "<string>",
-                    "emailAddress": "<string>",
-                    "kind": "drive#user",
-                    "me": "<boolean>",
-                    "permissionId": "<string>",
-                    "photoLink": "<string>"
-                  },
-                  "md5Checksum": "<string>",
-                  "mimeType": "<string>",
-                  "modifiedTime": "<dateTime>",
-                  "originalFilename": "<string>",
-                  "publishAuto": "<boolean>",
-                  "published": "<boolean>",
-                  "publishedLink": "<string>",
-                  "publishedOutsideDomain": "<boolean>",
-                  "size": "<int64>"
-                }
-                ```
+            size (string): size Example: '<int64>'.
 
         Returns:
             dict[str, Any]: Successful response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Revisions
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
+            raise ValueError("Missing required parameter 'fileId'.")
         if revisionId is None:
-            raise ValueError("Missing required parameter 'revisionId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'revisionId'.")
+        request_body_data = None
+        request_body_data = {
             'exportLinks': exportLinks,
             'id': id,
             'keepForever': keepForever,
@@ -4208,22 +2813,31 @@ class GoogleDriveApp(APIApplication):
             'publishedOutsideDomain': publishedOutsideDomain,
             'size': size,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/files/{fileId}/revisions/{revisionId}"
         query_params = {k: v for k, v in [('alt', alt), ('fields', fields), ('key', key), ('oauth_token', oauth_token), ('prettyPrint', prettyPrint), ('quotaUser', quotaUser), ('userIp', userIp)] if v is not None}
-        response = self._patch(url, data=request_body, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def list_all_members_of_achannel(self, channel=None) -> dict[str, Any]:
+    def list_all_members_of_achannel(self, channel: Optional[str] = None) -> dict[str, Any]:
         """
         List all members of a channel
 
         Args:
-            channel (string): No description provided. Example: '{{channelId}}'.
+            channel (string): Specifies the channel for which to retrieve conversation members; must be a valid channel identifier. Example: '{{channelId}}'.
 
         Returns:
             dict[str, Any]: Success Response
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Google Drive API Use Cases, Share file access to a slack channel
@@ -4232,17 +2846,26 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('channel', channel)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def fetch_user_email(self, user=None) -> dict[str, Any]:
+    def fetch_user_email(self, user: Optional[str] = None) -> dict[str, Any]:
         """
         Fetch User Email
 
         Args:
-            user (string): No description provided. Example: '{{currentUserId}}'.
+            user (string): Specifies the user identifier to retrieve information for; the value should be a unique string. Example: '{{currentUserId}}'.
 
         Returns:
             dict[str, Any]: Fetch User Email
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Google Drive API Use Cases, Share file access to a slack channel
@@ -4251,9 +2874,14 @@ class GoogleDriveApp(APIApplication):
         query_params = {k: v for k, v in [('user', user)] if v is not None}
         response = self._get(url, params=query_params)
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
-    def grant_google_drive_access(self, fileId, emailAddress=None, role=None, type=None) -> dict[str, Any]:
+    def grant_google_drive_access(self, fileId: str, emailAddress: Optional[str] = None, role: Optional[str] = None, type: Optional[str] = None) -> dict[str, Any]:
         """
         Grant Google Drive Access
 
@@ -4261,35 +2889,37 @@ class GoogleDriveApp(APIApplication):
             fileId (string): fileId
             emailAddress (string): emailAddress Example: '{{currentEmailId}}'.
             role (string): role Example: 'reader'.
-            type (string): type
-                Example:
-                ```json
-                {
-                  "emailAddress": "{{currentEmailId}}",
-                  "role": "reader",
-                  "type": "user"
-                }
-                ```
+            type (string): type Example: 'user'.
 
         Returns:
             dict[str, Any]: Grant Google Drive Access
+
+        Raises:
+            HTTPError: Raised when the API request fails (e.g., non-2XX status code).
+            JSONDecodeError: Raised if the response body cannot be parsed as JSON.
 
         Tags:
             Google Drive API Use Cases, Share file access to a slack channel
         """
         if fileId is None:
-            raise ValueError("Missing required parameter 'fileId'")
-        request_body = {
+            raise ValueError("Missing required parameter 'fileId'.")
+        request_body_data = None
+        request_body_data = {
             'emailAddress': emailAddress,
             'role': role,
             'type': type,
         }
-        request_body = {k: v for k, v in request_body.items() if v is not None}
+        request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/drive/v3/files/{fileId}/permissions"
         query_params = {}
-        response = self._post(url, data=request_body, params=query_params)
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
         response.raise_for_status()
-        return response.json()
+        if response.status_code == 204 or not response.content or not response.text.strip():
+            return None
+        try:
+            return response.json()
+        except ValueError:
+            return None
 
     def list_tools(self):
         return [
@@ -4306,9 +2936,9 @@ class GoogleDriveApp(APIApplication):
             self.get_aspecific_app,
             self.information_about_user_and_drive,
             self.list_changes_made_to_afile_or_drive,
-            self.gets_the_starting_pagetoken_for_listing_future_changes,
+            self.get_start_page_token,
             self.subscribe_to_changes_for_auser,
-            self.stop_watching_resources_through_achannel,
+            self.post_stop_channel,
             self.lists_afile_scomments,
             self.create_acomment_on_afile,
             self.get_comment_by_id,
@@ -4319,22 +2949,22 @@ class GoogleDriveApp(APIApplication):
             self.get_ashared_drive_smetadata_by_id,
             self.permanently_delete_ashared_drive,
             self.update_metadata_for_ashared_drive,
-            self.hide_ashared_drive_from_the_default_view,
-            self.restore_shared_drive_to_default_view,
+            self.hide_drive_by_id_post,
+            self.unhide_drive,
             self.list_user_sfiles,
             self.create_anew_file,
             self.generate_aset_of_file_ids,
-            self.permanently_delete_all_of_the_trashed_files,
+            self.empty_trash_files,
             self.get_afile_smetadata_or_content_by_id,
-            self.permanently_delete_afile_without_moving_it_to_the_trash,
-            self.update_afile_smetadata_and_or_content,
-            self.create_acopy_of_afile_and_apply_any_requested_update,
+            self.delete_file_by_id,
+            self.update_file,
+            self.copy_file_by_id,
             self.export_agoogle_workspace_document,
             self.list_the_labels_on_afile,
             self.modify_labels_applied_to_afile,
             self.subscribe_to_changes_to_afile,
-            self.list_afile_sor_shared_drive_spermissions,
-            self.create_apermission_for_afile_or_shared_drive,
+            self.list_file_permissions,
+            self.post_file_permission,
             self.get_permission_by_id,
             self.delete_apermission,
             self.update_apermission,
