@@ -38,7 +38,7 @@ class GoogleDriveApp(APIApplication):
         return response.json()
 
     def list_files(
-        self, page_size: int = 10, query: str = None, order_by: str = None
+        self, page_size: int = 10, query: str | None = None, order_by: str | None = None
     ) -> dict[str, Any]:
         """
         Lists and retrieves files from Google Drive with optional filtering, pagination, and sorting.
