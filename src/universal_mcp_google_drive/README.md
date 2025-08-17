@@ -65,3 +65,4 @@ This is automatically generated from OpenAPI schema for the GoogleDriveApp API.
 | `list_all_members_of_achannel` | List all members of a channel |
 | `fetch_user_email` | Fetch User Email |
 | `grant_google_drive_access` | Grant Google Drive Access |
+| `move_files` | Moves a file from one folder to another by adding a new parent and removing the old parent. |
