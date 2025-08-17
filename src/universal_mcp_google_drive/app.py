@@ -17,6 +17,36 @@ class GoogleDriveApp(APIApplication):
         super().__init__(name="google-drive", integration=integration)
         self.base_url = "https://www.googleapis.com/drive/v3"
 
+    def move_files(self, file_id: str, add_parents: str, remove_parents: str) -> dict[str, Any]:
+        """
+        Moves a file from one folder to another by adding a new parent and removing the old parent.
+
+        Args:
+            file_id: The ID of the file to move
+            add_parents: The ID of the destination folder (new parent)
+            remove_parents: The ID of the source folder (old parent to remove)
+
+        Returns:
+            A dictionary containing the updated file information
+
+        Raises:
+            HTTPError: If the API request fails or returns an error status code
+            ConnectionError: If there are network connectivity issues
+            AuthenticationError: If the authentication credentials are invalid or expired
+
+        Tags:
+            move, file, folder, parent, patch, api, important
+        """
+        url = f"{self.base_url}/files/{file_id}"
+        data={}
+        params = {
+            "addParents": add_parents,
+            "removeParents": remove_parents
+        }
+        response = self._patch(url, params=params ,data=data)
+        response.raise_for_status()
+        return response.json()
+
     def get_drive_info(self) -> dict[str, Any]:
         """
         Retrieves detailed information about the user's Google Drive storage and account.
@@ -36,6 +66,8 @@ class GoogleDriveApp(APIApplication):
         params = {"fields": "storageQuota,user"}
         response = self._get(url, params=params)
         return response.json()
+
+        
 
     def list_files(
         self, page_size: int = 10, query: str | None = None, order_by: str | None = None
@@ -2979,5 +3011,6 @@ class GoogleDriveApp(APIApplication):
             self.update_arevision,
             self.list_all_members_of_achannel,
             self.fetch_user_email,
-            self.grant_google_drive_access
+            self.grant_google_drive_access,
+            self.move_files
         ]
