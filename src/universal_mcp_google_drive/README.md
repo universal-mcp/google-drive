@@ -40,7 +40,7 @@ This is automatically generated from OpenAPI schema for the GoogleDriveApp API.
 | `create_anew_file` | Create a new file |
 | `generate_aset_of_file_ids` | Generate a set of file IDs |
 | `empty_trash_files` | Permanently delete all of the trashed files |
-| `get_afile_smetadata_or_content_by_id` | Get a file's metadata or content by ID |
+| `get_file_metadata` | Get a file's metadata. Use to it to get infromation like parents |
 | `delete_file_by_id` | Permanently delete a file without moving it to the trash |
 | `update_file` | Update a file's metadata and/or content |
 | `copy_file_by_id` | Create a copy of a file and apply any requested update |
