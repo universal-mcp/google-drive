@@ -2987,7 +2987,7 @@ class GoogleDriveApp(APIApplication):
             self.create_anew_file,
             self.generate_aset_of_file_ids,
             self.empty_trash_files,
-            self.get_afile_smetadata_or_content_by_id,
+            self.get_file_metadata,
             self.delete_file_by_id,
             self.update_file,
             self.copy_file_by_id,
