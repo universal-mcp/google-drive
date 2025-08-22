@@ -1503,9 +1503,9 @@ class GoogleDriveApp(APIApplication):
         except ValueError:
             return None
 
-    def get_afile_smetadata_or_content_by_id(self, fileId: str, acknowledgeAbuse: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
+    def get_file_metadata(self, fileId: str, acknowledgeAbuse: Optional[str] = None, includeLabels: Optional[str] = None, includePermissionsForView: Optional[str] = None, supportsAllDrives: Optional[str] = None, supportsTeamDrives: Optional[str] = None, alt: Optional[str] = None, fields: Optional[str] = None, key: Optional[str] = None, oauth_token: Optional[str] = None, prettyPrint: Optional[str] = None, quotaUser: Optional[str] = None, userIp: Optional[str] = None) -> dict[str, Any]:
         """
-        Get a file's metadata or content by ID
+        Get a file's metadata. Use to it to get infromation like parents
 
         Args:
             fileId (string): fileId
@@ -1515,7 +1515,7 @@ class GoogleDriveApp(APIApplication):
             supportsAllDrives (string): Whether the requesting application supports both My Drives and shared drives. Example: '<boolean>'.
             supportsTeamDrives (string): Deprecated use supportsAllDrives instead. Example: '<boolean>'.
             alt (string): Data format for the response. Example: 'json'.
-            fields (string): Selector specifying which fields to include in a partial response. Example: '<string>'.
+            fields (string): Selector specifying which fields to include in a partial response. Example: "id","name","parents"
             key (string): API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token. Example: '{{key}}'.
             oauth_token (string): OAuth 2.0 token for the current user. Example: '{{oauthToken}}'.
             prettyPrint (string): Returns response with indentations and line breaks. Example: '<boolean>'.
